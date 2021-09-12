@@ -1,0 +1,164 @@
+QWidget {
+    background-color: transparent;
+    color: #FFF;
+    font-family: "B612 Mono";
+    font-size: 16px;
+}
+
+QMainWindow {
+    background: black;
+}
+
+QFrame[frameShape="4"]
+{
+    max-height: 1px;
+    border: none;
+    background: #4d4d4d;
+}
+
+QGridLayout {
+    qproperty-spacing: 50px;
+}
+
+QAbstractButton {
+    background-color: #4d4d4d;
+
+    min-height: 20px;
+    padding: 5px 10px;
+    border: 2px solid;
+    border-top-color: #e6e6e6;
+    border-left-color: #e6e6e6;
+    border-right-color: #b3b3b3;
+    border-bottom-color: #b3b3b3;
+}
+
+QAbstractButton:disabled {
+    color: #999999;
+}
+
+QAbstractButton:hover {
+    background-color: #808080;
+}
+
+QAbstractButton:pressed {
+    background-color: #a6a6a6;
+
+    border-right-color: #e6e6e6;
+    border-bottom-color: #e6e6e6;
+    border-left-color: #b3b3b3;
+    border-top-color: #b3b3b3;
+}
+
+RedButton {
+    background-color: #b30000;
+}
+
+RedButton:hover {
+    background-color: #e60000;
+}
+
+RedButton:pressed {
+    background-color: #ff0000;
+}
+
+QLabel#titleLabel {
+    font-size: 20px;
+}
+
+TableHeaderLabel {
+    font-size: 20px;
+    border: 1px solid;
+    border-bottom-color: #4d4d4d;
+    color: #808080;
+    padding-bottom: 5px;
+    qproperty-alignment: AlignCenter;
+}
+
+ChannelNameLabel {
+    min-height: 80px;
+    font-size: 25px;
+    border: 2px solid #e6e6e6;
+    padding: 10px 20px;
+    qproperty-alignment: AlignCenter;
+}
+
+ChannelLayoutPlaceholderLabel {
+    min-height: 100px;
+    min-width: 200px;
+}
+
+ChannelPlaceholderPromptLabel {
+    color: #4d4d4d;
+    font-size: 50px;
+    qproperty-alignment: AlignCenter;
+}
+
+BigContentLabel, FreqWavelengthLabel {
+    font-size: 40px;
+}
+
+ErrorLabel {
+    background: #ff0000;
+    min-height: 60px;
+    font-size: 20px;
+    qproperty-alignment: AlignCenter;
+}
+
+MonitorEnableButton {
+    height: 20px;
+    width: 20px;
+}
+
+MonitorEnableButton:hover, MonitorEnableButton:pressed {
+    background-color: #ffb84d;
+}
+
+ToggleButton:checked {
+    background-color: #ff9900;
+
+    border-right-color: #e6e6e6;
+    border-bottom-color: #e6e6e6;
+    border-left-color: #b3b3b3;
+    border-top-color: #b3b3b3;
+}
+
+ToggleButton:unchecked {
+}
+
+Dialog {
+    border: 5px solid #b3b3b3;
+    background: black;
+}
+
+QGroupBox {
+    margin-top: 1ex;
+    padding-top: 1ex;
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+}
+
+QGroupBox:title {
+    color: #00bfff;
+    subcontrol-origin: margin;
+    margin-left: 5px;
+    background: black;
+}
+
+QLineEdit {
+    min-height: 25px;
+    color: #00e600;
+    border: 1px solid #4b4b4b;
+}
+
+QLineEdit:disabled {
+    background: #333333;
+    color: #00e600;
+    border: 1px solid #4b4b4b;
+}
+
+DialogTitleLabel {
+    color: #000;
+    font-size: 25px;
+    background: #b3b3b3;
+    padding: 5px;
+}

@@ -1,0 +1,1 @@
+from .wavemeter_ws7 import WavemeterWS7, WavemeterWS7Exception

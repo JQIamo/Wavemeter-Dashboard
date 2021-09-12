@@ -1,0 +1,23 @@
+# TODO
+
+- [x] dac: control instruction
+- [x] dac: out-of-bound exception
+- [ ] monitor: dac output
+- [ ] wavemeter: read/set exposure params
+- [ ] channel setup widget: fill in auto exposure params
+- [ ] monitor: set auto exposure params when switching
+- [ ] dashboard: stacked widget
+- [ ] wavemeter: get exposure data
+- [ ] wavemeter: under-exposure over-exposure exception
+- [ ] wavemeter: get power data
+- [ ] dashboard: channel strip background
+- [ ] dashboard: flash warning
+- [ ] channel view: emit warning
+- [ ] monitor: pid railed text warning
+- [ ] big screen: mulit-plot display
+- [ ] big screen: freq display
+- [ ] monitor: single channel monitoring
+- [ ] big screen: channel settings
+- [ ] dashboard: add/delete columns
+- [ ] thumbnail: scroll zoom in/out
+- [ ] dashboard: dynamic thumbnail plot min/max adjustment
