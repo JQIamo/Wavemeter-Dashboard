@@ -41,13 +41,14 @@ if __name__ == "__main__":
     assert config.config.has("dac_com_port")
     fbs_port = config.config.get("fiberswitch_com_port")
     dac_port = config.config.get("dac_com_port")
-    # wm = WavemeterWS7()
-    # fs = FiberSwitch(fbs_port)
-    # dac = DAC(dac_port)
 
-    wm = None
-    fs = None
-    dac = None
+    wm = WavemeterWS7()
+    fs = FiberSwitch(fbs_port)
+    dac = DAC(dac_port)
+
+    # wm = None
+    # fs = None
+    # dac = None
 
     monitor = Monitor(wm, fs, dac)
     dashboard = Dashboard(window, monitor)

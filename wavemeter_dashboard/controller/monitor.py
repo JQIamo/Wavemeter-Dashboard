@@ -84,13 +84,20 @@ class Monitor:
 
         if ch.pid_enabled and ch.freq_setpoint:
             ch.pid_i += ch.error  # TODO: * delta
-            ch.dac_output = ch.pid_p_prop_val * ch.error \
-                + ch.pid_i_prop_val * ch.pid_i
+            prev_dac_output = ch.dac_output
+            output = ch.pid_p_prop_val * ch.error + ch.pid_i_prop_val * ch.pid_i
+            delta = ch.dac_output - prev_dac_output
 
-            self.dac.set_dac_value(ch.dac_channel_num, ch.dac_output)
-            ch.append_longterm_data(ch.dac_longterm_data, ch.dac_output)
+            # try:
+            self.dac.set_dac_inc(ch.dac_channel_num, delta)
+
+            ch.dac_output = self.dac.get_dac_value(ch.dac_channel_num)
+            ch.append_longterm_data(ch.dac_longterm_data, output)
 
             ch.on_pid_changed.emit()
+
+    def get_auto_expo_params(self, channel):
+        pass
 
     def stop_monitoring(self):
         if not self.monitoring_lock.locked():

@@ -2,10 +2,13 @@
 
 - [x] dac: control instruction
 - [x] dac: out-of-bound exception
-- [ ] monitor: dac output
+- [x] channel setup: unit display
+- [ ] channel setup: auto set exposure param
+- [x] monitor: dac output
 - [ ] wavemeter: read/set exposure params
 - [ ] channel setup widget: fill in auto exposure params
 - [ ] monitor: set auto exposure params when switching
+- [ ] dashboard: column width
 - [ ] dashboard: stacked widget
 - [ ] wavemeter: get exposure data
 - [ ] wavemeter: under-exposure over-exposure exception
@@ -18,6 +21,7 @@
 - [ ] big screen: freq display
 - [ ] monitor: single channel monitoring
 - [ ] big screen: channel settings
-- [ ] dashboard: add/delete columns
+- [ ] dashboard: add/delete columns dialog
+- [ ] dashboard: save layout
 - [ ] thumbnail: scroll zoom in/out
 - [ ] dashboard: dynamic thumbnail plot min/max adjustment

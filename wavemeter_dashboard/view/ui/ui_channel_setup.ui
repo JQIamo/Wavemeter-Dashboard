@@ -132,7 +132,11 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QLineEdit" name="setpointEdit"/>
+     <widget class="QLineEdit" name="setpointEdit">
+      <property name="placeholderText">
+       <string>THz</string>
+      </property>
+     </widget>
     </item>
     <item row="0" column="0">
      <widget class="QLabel" name="label_6">

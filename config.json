@@ -1,44 +1,6 @@
 {
     "after_switch_wait_time": 0.2,
-    "channels": [
-        {
-            "auto_expo_enabled": false,
-            "channel_color": [
-                0,
-                204,
-                204
-            ],
-            "channel_name": "aaa",
-            "channel_num": 1,
-            "dac_channel_num": null,
-            "expo2_time": null,
-            "expo_time": null,
-            "freq_setpoint": null,
-            "pattern_enabled": true,
-            "pid_enabled": false,
-            "pid_i_prop_val": 0,
-            "pid_p_prop_val": -1,
-            "wide_pattern_enabled": false
-        },
-        {
-            "auto_expo_enabled": false,
-            "channel_color": [
-                0,
-                0,
-                204
-            ],
-            "channel_name": "bbb",
-            "channel_num": 2,
-            "dac_channel_num": null,
-            "expo2_time": null,
-            "expo_time": null,
-            "freq_setpoint": null,
-            "pattern_enabled": true,
-            "pid_enabled": false,
-            "pid_i_prop_val": 0,
-            "pid_p_prop_val": -1,
-            "wide_pattern_enabled": false
-        }
-    ],
+    "fiberswitch_com_port": "COM5",
+    "dac_com_port": "COM8",
     "longterm_length_limit": 200
 }

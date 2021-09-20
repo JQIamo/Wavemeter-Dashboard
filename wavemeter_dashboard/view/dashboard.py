@@ -112,7 +112,9 @@ class Dashboard(QWidget):
             (ColumnType.NAME, view.channel_name_label),
             (ColumnType.FREQ, view.freq_label),
             (ColumnType.PATTERN, view.pattern),
-            (ColumnType.FREQ_LONGTERM, view.freq_longterm)
+            (ColumnType.FREQ_LONGTERM, view.freq_longterm),
+            (ColumnType.PID_ERROR_LONGTERM, view.error_longterm),
+            (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm),
         ]:
             self.ui.channelGridLayout.addWidget(
                 widget,

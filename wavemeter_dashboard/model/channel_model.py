@@ -57,7 +57,6 @@ class ChannelModel(QObject):
 
         self.expo_time = None
         self.expo2_time = None
-        self.auto_expo_enabled = False
 
         self.pid_enabled = False
         self.freq_setpoint = None
@@ -66,7 +65,7 @@ class ChannelModel(QObject):
         self.pid_i = 0
         self.error = 0
         self.error_longterm_data = {}
-        self.dac_output = None
+        self.dac_output = 0
         self.dac_longterm_data = {}
         self.dac_railed = False
 
@@ -101,7 +100,6 @@ class ChannelModel(QObject):
                               self.channel_color.blue()],
             'pattern_enabled': self.pattern_enabled,
             'wide_pattern_enabled': self.wide_pattern_enabled,
-            'auto_expo_enabled': self.auto_expo_enabled,
             'expo_time': self.expo_time,
             'expo2_time': self.expo2_time,
             'pid_enabled': self.pid_enabled,
@@ -118,7 +116,6 @@ class ChannelModel(QObject):
                                color, _dict['dac_channel_num'])
         channel.pattern_enabled = _dict['pattern_enabled']
         channel.wide_pattern_enabled = _dict['wide_pattern_enabled']
-        channel.auto_expo_enabled = _dict['auto_expo_enabled']
         channel.expo_time = _dict['expo_time']
         channel.expo2_time = _dict['expo2_time']
         channel.pid_enabled = _dict['pid_enabled']
