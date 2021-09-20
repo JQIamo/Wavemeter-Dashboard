@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget
 from .ui.ui_dashboard import Ui_dashboard
 from .widgets.misc import *
 from .widgets.add_channel_dialog import AddChannelDialog
+from .widgets.color_strip import ColorStrips
 from .channel_view import ChannelView
 from wavemeter_dashboard.model.channel_model import ChannelModel
 from wavemeter_dashboard.config import config
@@ -42,11 +43,14 @@ class Dashboard(QWidget):
     }
 
     row_height = 105
+    vertical_spacing = 20
+    horizontal_spacing = 40
 
     def __init__(self, parent, monitor):
         super().__init__(parent)
 
         self.channels = []
+        self.color_strips = {}
         self.monitor = monitor
 
         self.pattern_max_amp = 0
@@ -55,8 +59,8 @@ class Dashboard(QWidget):
         self.ui = Ui_dashboard()
         self.ui.setupUi(self)
 
-        self.ui.channelGridLayout.setVerticalSpacing(20)
-        self.ui.channelGridLayout.setHorizontalSpacing(40)
+        self.ui.channelGridLayout.setVerticalSpacing(self.vertical_spacing)
+        self.ui.channelGridLayout.setHorizontalSpacing(self.horizontal_spacing)
 
         self._init_table_header()
 
@@ -70,6 +74,8 @@ class Dashboard(QWidget):
         self.ui.monBtn.setEnabled(False)
 
         self.center_floating_widget = None
+
+        self.monitor.on_monitoring_channel.connect(self.on_monitoring_channel)
 
         self.load_channels_from_config()
 
@@ -103,9 +109,14 @@ class Dashboard(QWidget):
             self.ui.monBtn.setEnabled(False)
 
     def add_channel(self, channel: ChannelModel):
+        self.ui.addChannelBtn.setEnabled(True)
+        self.ui.saveSettingsBtn.setText("SAVE*")
+        self.ui.monBtn.setEnabled(True)
+
         view = ChannelView(self, channel)
         self._remove_channel_placeholder()
         self.channels.append(view)
+        self.color_strips[channel.channel_num] = ColorStrips(self)
         self.monitor.add_channel(channel)
 
         for col_type, widget in [
@@ -122,25 +133,15 @@ class Dashboard(QWidget):
                 self.column_num_map[col_type]
             )
             widget.setFixedHeight(self.row_height)
-#
-#         self.ui.channelGridLayout.addItem(
-#             QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum),
-#             len(self.channels) + 1, 0, len(self.channels) + 1,
-#             self.ui.channelGridLayout.columnCount() - 1
-#         )
+
+        self.resize_color_strips()
 
     def on_add_channel_clicked(self):
         dialog = AddChannelDialog(self, self.monitor)
-        dialog.on_apply.connect(self.add_channel)
         self.ui.addChannelBtn.setEnabled(False)
         self.ui.monBtn.setEnabled(False)
 
-        def f(x):
-            self.ui.addChannelBtn.setEnabled(True)
-            self.ui.saveSettingsBtn.setText("SAVE*")
-            self.ui.monBtn.setEnabled(True)
-
-        dialog.on_close.connect(f)
+        dialog.on_apply.connect(self.add_channel)
         dialog.show()
 
     def display_message_box(self, title, message):
@@ -151,7 +152,19 @@ class Dashboard(QWidget):
         if self.center_floating_widget:
             self.center_floating_widget.move_to_center()
 
-    def on_monitor_toggled(self, state):    
+        self.resize_color_strips()
+
+    def resize_color_strips(self):
+        for channel in self.channels:
+            y = channel.channel_name_label.y() - 0.5 * self.vertical_spacing
+            h = self.row_height + self.vertical_spacing
+
+            self.color_strips[channel.channel_model.channel_num].set_position(
+                0, y,
+                self.width(), h
+            )
+
+    def on_monitor_toggled(self, state):
         if state:
             self.monitor.start_monitoring()
             self.ui.addChannelBtn.setEnabled(False)
@@ -166,3 +179,10 @@ class Dashboard(QWidget):
         config.set('channels', channel_list)
         config.save()
         self.ui.saveSettingsBtn.setText("SAVE")
+
+    def on_monitoring_channel(self, channel_num):
+        for num, strip in self.color_strips.items():
+            if num == channel_num:
+                strip.show_info()
+            else:
+                strip.hide_info()

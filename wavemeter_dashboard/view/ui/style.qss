@@ -104,6 +104,18 @@ ErrorLabel {
     qproperty-alignment: AlignCenter;
 }
 
+ErrorBox {
+    background: #ff0000;
+}
+
+InfoBox {
+    background: #005ce6;
+}
+
+WarningBox {
+    background: #ff6600;
+}
+
 MonitorEnableButton {
     height: 20px;
     width: 20px;

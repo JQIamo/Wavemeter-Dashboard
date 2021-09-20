@@ -79,10 +79,14 @@ class WavemeterWS7:
 
     def set_exposure(self, expo, expo2):
         ret = api.dll.SetExposure(expo)
-        assert ret == 0, f"WLM Error: {self.error_msg_for_set_func(ret)}"
+        if ret != 0:
+            raise WavemeterWS7Exception(
+                f"WLM Error: {self.error_msg_for_set_func(ret)}")
 
         ret = api.dll.SetExposure2(expo2)
-        assert ret == 0, f"WLM Error: {self.error_msg_for_set_func(ret)}"
+        if ret != 0:
+            raise WavemeterWS7Exception(
+                f"WLM Error: {self.error_msg_for_set_func(ret)}")
 
     def get_next_pattern(self, wide=False):
         if not self._pattern_wait_event_registered:

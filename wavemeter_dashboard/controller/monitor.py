@@ -1,7 +1,7 @@
 import time
 from threading import Thread, Lock, Condition
 from functools import partial
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QObject
 
 from wavemeter_dashboard.controller.wavemeter_ws7 import WavemeterWS7, WavemeterWS7Exception
 from wavemeter_dashboard.controller.fiber_switch import FiberSwitch
@@ -10,13 +10,15 @@ from wavemeter_dashboard.config import config
 from wavemeter_dashboard.model.channel_model import ChannelModel
 
 
-class Monitor:
+class Monitor(QObject):
     on_monitor_started = pyqtSignal()
     on_monitor_stop_req = pyqtSignal()
     on_monitor_stopped = pyqtSignal()
+    on_monitoring_channel = pyqtSignal(int)
     on_channel_error = pyqtSignal(str)
 
     def __init__(self, wavemeter: WavemeterWS7, fiberswitch: FiberSwitch, dac: DAC):
+        super().__init__()
         self.wavemeter = wavemeter
         self.fiberswitch = fiberswitch
         self.dac = dac
@@ -29,6 +31,7 @@ class Monitor:
         self.monitor_stop_cv = Condition()
 
         self.monitored_channels = []
+        self.last_monitored_channel = None
 
         self.after_switch_wait_time = config.get('after_switch_wait_time', 0.2)
 
@@ -47,9 +50,11 @@ class Monitor:
                     if self.stop_monitoring_flag:
                         break
 
+                    self.on_monitoring_channel.emit()
                     self._update_one_channel(channel.channel_num)
 
         self.stop_monitoring_flag = False
+        self.last_monitored_channel = None
 
         with self.monitor_stop_cv:
             self.monitor_stop_cv.notify_all()
@@ -57,11 +62,14 @@ class Monitor:
     def _update_one_channel(self, channel_num):
         ch: ChannelModel = self.channels[channel_num]
 
-        self.fiberswitch.switch_channel(channel_num)
-        time.sleep(0.2)
+        if not self.last_monitored_channel or self.last_monitored_channel != ch:
+            self.fiberswitch.switch_channel(channel_num)
+            time.sleep(0.2)
 
-        self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
-        time.sleep(1)
+            self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
+            time.sleep(1)
+
+            self.last_monitored_channel = ch
 
         try:
             ch.frequency = self.wavemeter.get_frequency()

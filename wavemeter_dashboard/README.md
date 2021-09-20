@@ -7,19 +7,22 @@
 - [x] wavemeter: read/set exposure params
 - [x] channel setup widget: fill in auto exposure params
 - [x] monitor: set auto exposure params when switching
+- [x] dashboard: channel strip background
+- [x] dashboard: flash warning
+- [ ] channel view: emit warning
+- [ ] wavemeter: under-exposure over-exposure exception
+- [ ] monitor: pid out-of-lock text warning
+- [ ] monitor: pid railed text warning
+- [ ] dashboard: remove channel from monitoring
+- [ ] dashboard: delete channel
+- [ ] dashboard: add/delete columns dialog
 - [ ] dashboard: column width
 - [ ] dashboard: stacked widget
-- [ ] wavemeter: under-exposure over-exposure exception
 - [ ] wavemeter: get power data
-- [ ] dashboard: channel strip background
-- [ ] dashboard: flash warning
-- [ ] channel view: emit warning
-- [ ] monitor: pid railed text warning
 - [ ] big screen: mulit-plot display
 - [ ] big screen: freq display
 - [ ] monitor: single channel monitoring
 - [ ] big screen: channel settings
-- [ ] dashboard: add/delete columns dialog
 - [ ] dashboard: save layout
 - [ ] thumbnail: scroll zoom in/out
 - [ ] dashboard: dynamic thumbnail plot min/max adjustment
