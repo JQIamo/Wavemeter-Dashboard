@@ -3,14 +3,12 @@
 - [x] dac: control instruction
 - [x] dac: out-of-bound exception
 - [x] channel setup: unit display
-- [ ] channel setup: auto set exposure param
 - [x] monitor: dac output
-- [ ] wavemeter: read/set exposure params
-- [ ] channel setup widget: fill in auto exposure params
-- [ ] monitor: set auto exposure params when switching
+- [x] wavemeter: read/set exposure params
+- [x] channel setup widget: fill in auto exposure params
+- [x] monitor: set auto exposure params when switching
 - [ ] dashboard: column width
 - [ ] dashboard: stacked widget
-- [ ] wavemeter: get exposure data
 - [ ] wavemeter: under-exposure over-exposure exception
 - [ ] wavemeter: get power data
 - [ ] dashboard: channel strip background

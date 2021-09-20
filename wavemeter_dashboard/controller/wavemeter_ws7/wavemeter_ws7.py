@@ -58,15 +58,31 @@ class WavemeterWS7:
 
         return pressure
 
+    def is_auto_exposure(self):
+        return api.dll.GetExposureMode()
+
+    def set_auto_exposure(self, on):
+        ret = api.dll.SetExposureMode(on)
+        assert ret == 0, f"WLM Error: {self.error_msg_for_set_func(ret)}"
+
     def get_exposure(self):
         # Read exposure of CCD arrays, return value in ms
         exposure = api.dll.GetExposure(0)
+        exposure2 = api.dll.GetExposure2(0)
+
         if exposure == const.ErrWlmMissing:
             raise WavemeterWS7Exception("Exposure: WLM not active")
         elif exposure == const.ErrNotAvailable:
             raise WavemeterWS7Exception("Exposure: Not available")
 
-        return exposure
+        return exposure, exposure2
+
+    def set_exposure(self, expo, expo2):
+        ret = api.dll.SetExposure(expo)
+        assert ret == 0, f"WLM Error: {self.error_msg_for_set_func(ret)}"
+
+        ret = api.dll.SetExposure2(expo2)
+        assert ret == 0, f"WLM Error: {self.error_msg_for_set_func(ret)}"
 
     def get_next_pattern(self, wide=False):
         if not self._pattern_wait_event_registered:
@@ -79,7 +95,7 @@ class WavemeterWS7:
         intval = c_long(1)
         dblval = c_double(0)
 
-        pattern_flag = const.cSignal1Interferometers if not wide else\
+        pattern_flag = const.cSignal1Interferometers if not wide else \
             const.cSignal1WideInterferometer
 
         while True:
@@ -107,7 +123,7 @@ class WavemeterWS7:
                                 const.cNotifyInstallWaitEvent,
                                 c_long(-1), c_long(0))
 
-        pattern_flag = const.cSignal1Interferometers if not wide else\
+        pattern_flag = const.cSignal1Interferometers if not wide else \
             const.cSignal1WideInterferometer
 
         count = api.dll.GetPatternItemCount(pattern_flag)
@@ -122,3 +138,29 @@ class WavemeterWS7:
 
         return np.frombuffer(patterns, dtype=np.ushort)
 
+    def error_msg_for_set_func(self, code):
+        _lookup = {
+            0: "ResERR_NoErr",
+            -1: "ResERR_WlmMissing",
+            -2: "ResERR_CouldNotSet",
+            -3: "ResERR_ParmOutOfRange",
+            -4: "ResERR_WlmOutOfResources",
+            -5: "ResERR_WlmInternalError",
+            -6: "ResERR_NotAvailable",
+            -7: "ResERR_WlmBusy",
+            -8: "ResERR_NotInMeasurementMode",
+            -9: "ResERR_OnlyInMeasurementMode",
+            -10: "ResERR_ChannelNotAvailable",
+            -11: "ResERR_ChannelTemporarilyNotAvailable",
+            -12: "ResERR_CalOptionNotAvailable",
+            -13: "ResERR_CalWavelengthOutOfRange",
+            -14: "ResERR_BadCalibrationSignal",
+            -15: "ResERR_UnitNotAvailable",
+            -16: "ResERR_FileNotFound",
+            -17: "ResERR_FileCreation",
+            -18: "ResERR_TriggerPending",
+            -19: "ResERR_TriggerWaiting",
+            -20: "ResERR_NoLegitimation",
+        }
+
+        return _lookup

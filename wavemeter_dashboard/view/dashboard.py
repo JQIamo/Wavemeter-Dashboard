@@ -130,7 +130,7 @@ class Dashboard(QWidget):
 #         )
 
     def on_add_channel_clicked(self):
-        dialog = AddChannelDialog(self)
+        dialog = AddChannelDialog(self, self.monitor)
         dialog.on_apply.connect(self.add_channel)
         self.ui.addChannelBtn.setEnabled(False)
         self.ui.monBtn.setEnabled(False)
