@@ -1,6 +1,5 @@
 import time
 from threading import Thread, Lock, Condition
-from functools import partial
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from wavemeter_dashboard.controller.wavemeter_ws7 import WavemeterWS7, WavemeterWS7Exception
@@ -15,7 +14,7 @@ class Monitor(QObject):
     on_monitor_stop_req = pyqtSignal()
     on_monitor_stopped = pyqtSignal()
     on_monitoring_channel = pyqtSignal(int)
-    on_channel_error = pyqtSignal(str)
+    on_channel_error = pyqtSignal(int, str)
 
     def __init__(self, wavemeter: WavemeterWS7, fiberswitch: FiberSwitch, dac: DAC):
         super().__init__()
@@ -35,8 +34,9 @@ class Monitor(QObject):
         self.after_switch_wait_time = config.get('after_switch_wait_time', 0.2)
 
     def start_monitoring(self):
-        self.monitor_thread = Thread(name="monitor", target=self._monitor)
+        self.monitor_thread = Thread(name="Monitor", target=self._monitor)
         self.monitor_thread.start()
+        self.on_monitor_started.emit()
 
     def _monitor(self):
         with self.monitoring_lock:
@@ -66,17 +66,24 @@ class Monitor(QObject):
             time.sleep(0.2)
 
             self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
-            time.sleep(0.2)
-
             self.last_monitored_channel = ch
         else:
             time.sleep(0.2)  # stop the PC from burning
 
-        try:
-            ch.frequency = self.wavemeter.get_frequency()
-        except WavemeterWS7Exception as e:
-            self.on_channel_error.emit(f"Channel {channel_num} error: {e}")
-            return
+        max_attempts = 6
+        for attempt in range(max_attempts):
+            # we don't know how long it needs for the wavemeter to settle down
+            # let's try for 300ms
+            try:
+                time.sleep(0.5)
+                ch.frequency = self.wavemeter.get_frequency()
+            except WavemeterWS7Exception as e:
+                if attempt < max_attempts - 1:
+                    pass
+                else:
+                    self.emit_channel_error(ch, e)
+                    # self.on_channel_error.emit(channel_num, f"Channel {channel_num} error: {e}")
+                    return
 
         ch.append_longterm_data(ch.freq_longterm_data, ch.frequency)
 
@@ -121,10 +128,12 @@ class Monitor(QObject):
     def stop_monitoring(self):
         if not self.monitoring_lock.locked():
             return
+        self.on_monitor_stop_req.emit()
 
         self.stop_monitoring_flag = True
         with self.monitor_stop_cv:
-            self.monitor_stop_cv.wait()  # TODO: timeout?
+            self.monitor_stop_cv.wait()
+            self.on_monitor_stopped.emit()
 
     def add_channel(self, channel):
         # should be called by the frontend
@@ -140,3 +149,6 @@ class Monitor(QObject):
             self.stop_monitoring()
 
         del self.channels[channel_num]
+
+    def emit_channel_error(self, channel, error):
+        pass
