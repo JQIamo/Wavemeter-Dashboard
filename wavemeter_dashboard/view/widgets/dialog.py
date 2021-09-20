@@ -34,7 +34,6 @@ class Dialog(QWidget):
         self.ui.cancelBtn.clicked.connect(self.on_cancel_clicked)
 
         self.setup_widget()
-        self.move_to_center()
 
         parent.center_floating_widget = self
 
@@ -45,6 +44,7 @@ class Dialog(QWidget):
 
     def show(self):
         super().show()
+        self.move_to_center()
 
     def init_widget(self):
         pass
@@ -54,10 +54,7 @@ class Dialog(QWidget):
         enclosing_widget = self.init_widget()
 
         # remove placeholder
-        self.ui.dialogLayout.insertWidget(0, enclosing_widget)
-
-        self.setMinimumHeight(enclosing_widget.height() + 130)
-        self.setMinimumWidth(enclosing_widget.width() + 35)
+        self.ui.dialogLayout.insertWidget(0, enclosing_widget, 1)
 
     def move_to_center(self):
         parent = self.parentWidget()

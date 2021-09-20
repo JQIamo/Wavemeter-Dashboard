@@ -59,7 +59,18 @@
        <item>
         <layout class="QHBoxLayout" name="mainLayout">
          <item>
-          <layout class="QVBoxLayout" name="graphLayout"/>
+          <layout class="QVBoxLayout" name="graphLayout">
+           <item>
+            <widget class="GraphicsLayoutWidget" name="graphicsView"/>
+           </item>
+           <item>
+            <widget class="BigContentLabel" name="freqLabel">
+             <property name="text">
+              <string>FREQ</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QVBoxLayout" name="setupLayout">
@@ -129,6 +140,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>BigContentLabel</class>
+   <extends>QLabel</extends>
+   <header>wavemeter_dashboard/view/widgets/misc</header>
+  </customwidget>
+  <customwidget>
    <class>TitleLabel</class>
    <extends>QLabel</extends>
    <header>wavemeter_dashboard/view/widgets/misc</header>
@@ -138,6 +154,11 @@
    <extends>QWidget</extends>
    <header>wavemeter_dashboard/view/widgets/channel_setup</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GraphicsLayoutWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <resources/>
