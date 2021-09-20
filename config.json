@@ -1,6 +1,65 @@
 {
     "after_switch_wait_time": 0.2,
-    "fiberswitch_com_port": "COM5",
+    "channels": [
+        {
+            "channel_color": [
+                204,
+                0,
+                51
+            ],
+            "channel_name": "679RP",
+            "channel_num": 9,
+            "dac_channel_num": 2,
+            "expo2_time": 22,
+            "expo_time": 10,
+            "freq_setpoint": 441.33259,
+            "monitor_enabled": true,
+            "pattern_enabled": true,
+            "pid_enabled": true,
+            "pid_i_prop_val": 0,
+            "pid_p_prop_val": 1000000.0,
+            "wide_pattern_enabled": false
+        },
+        {
+            "channel_color": [
+                102,
+                204,
+                0
+            ],
+            "channel_name": "707RP",
+            "channel_num": 11,
+            "dac_channel_num": 1,
+            "expo2_time": 22,
+            "expo_time": 10,
+            "freq_setpoint": 423.91359,
+            "monitor_enabled": true,
+            "pattern_enabled": true,
+            "pid_enabled": true,
+            "pid_i_prop_val": 0.0,
+            "pid_p_prop_val": 1000000.0,
+            "wide_pattern_enabled": false
+        },
+        {
+            "channel_color": [
+                0,
+                204,
+                102
+            ],
+            "channel_name": "707Inj",
+            "channel_num": 14,
+            "dac_channel_num": null,
+            "expo2_time": 22,
+            "expo_time": 44,
+            "freq_setpoint": null,
+            "monitor_enabled": false,
+            "pattern_enabled": true,
+            "pid_enabled": false,
+            "pid_i_prop_val": 0,
+            "pid_p_prop_val": -1,
+            "wide_pattern_enabled": false
+        }
+    ],
     "dac_com_port": "COM8",
+    "fiberswitch_com_port": "COM5",
     "longterm_length_limit": 200
 }

@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 from wavemeter_dashboard.controller.wavemeter_ws7 import WavemeterWS7, WavemeterWS7Exception
 from wavemeter_dashboard.controller.fiber_switch import FiberSwitch
-from wavemeter_dashboard.controller.arduino_dac import DAC
+from wavemeter_dashboard.controller.arduino_dac import DAC, DACOutOfBoundException
 from wavemeter_dashboard.config import config
 from wavemeter_dashboard.model.channel_model import ChannelModel
 
@@ -30,7 +30,6 @@ class Monitor(QObject):
         self.monitoring_lock = Lock()
         self.monitor_stop_cv = Condition()
 
-        self.monitored_channels = []
         self.last_monitored_channel = None
 
         self.after_switch_wait_time = config.get('after_switch_wait_time', 0.2)
@@ -44,13 +43,13 @@ class Monitor(QObject):
             self.wavemeter.set_auto_exposure(False)
             while not self.stop_monitoring_flag:
                 for channel in self.channels.values():
-                    if channel.channel_num not in self.monitored_channels:
+                    if not channel.monitor_enabled:
                         continue
 
                     if self.stop_monitoring_flag:
                         break
 
-                    self.on_monitoring_channel.emit()
+                    self.on_monitoring_channel.emit(channel.channel_num)
                     self._update_one_channel(channel.channel_num)
 
         self.stop_monitoring_flag = False
@@ -67,9 +66,11 @@ class Monitor(QObject):
             time.sleep(0.2)
 
             self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
-            time.sleep(1)
+            time.sleep(0.2)
 
             self.last_monitored_channel = ch
+        else:
+            time.sleep(0.2)  # stop the PC from burning
 
         try:
             ch.frequency = self.wavemeter.get_frequency()
@@ -81,8 +82,6 @@ class Monitor(QObject):
 
         if ch.freq_setpoint:
             ch.error = ch.frequency - ch.freq_setpoint
-            ch.append_longterm_data(ch.error_longterm_data,
-                                    ch.error)
 
         ch.on_freq_changed.emit()
 
@@ -96,14 +95,16 @@ class Monitor(QObject):
 
         if ch.pid_enabled and ch.freq_setpoint:
             ch.pid_i += ch.error  # TODO: * delta
-            prev_dac_output = ch.dac_output
-            output = ch.pid_p_prop_val * ch.error + ch.pid_i_prop_val * ch.pid_i
-            delta = ch.dac_output - prev_dac_output
+            prev_dac_output = self.dac.get_dac_value(ch.dac_channel_num)
+            output = prev_dac_output + ch.pid_p_prop_val * ch.error + ch.pid_i_prop_val * ch.pid_i
 
-            # try:
-            self.dac.set_dac_inc(ch.dac_channel_num, delta)
+            if self.dac.DAC_MIN <= output <= self.dac.DAC_MAX:
+                self.dac.set_dac_value(ch.dac_channel_num, output)
+                ch.dac_railed = False
+            else:
+                ch.dac_railed = True
 
-            ch.dac_output = self.dac.get_dac_value(ch.dac_channel_num)
+            ch.dac_output = output
             ch.append_longterm_data(ch.dac_longterm_data, output)
 
             ch.on_pid_changed.emit()
@@ -125,37 +126,17 @@ class Monitor(QObject):
         with self.monitor_stop_cv:
             self.monitor_stop_cv.wait()  # TODO: timeout?
 
-    def toggle_channel_monitoring_status(self, channel_num):
-        assert channel_num in self.channels
-        channel = self.channels[channel_num]
-
-        if channel.monitor_enabled:
-            assert channel_num in self.monitored_channels
-            channel.monitor_enabled = False
-            self.monitored_channels.remove(channel_num)
-        else:
-            assert channel_num not in self.monitored_channels
-            channel.monitor_enabled = True
-            self.monitored_channels.append(channel_num)
-
     def add_channel(self, channel):
         # should be called by the frontend
         self.channels[channel.channel_num] = channel
-
-        channel.on_monitor_state_changed.connect(
-            partial(self.toggle_channel_monitoring_status, channel.channel_num))
-        self.monitored_channels.append(channel.channel_num)
 
         return channel
 
     def remove_channel(self, channel_num):
         # should be called by the frontend
-        if channel_num in self.monitored_channels:
-            self.stop_monitoring()
-            self.monitored_channels.remove(channel_num)
-
         assert channel_num in self.channels
 
+        if self.channels[channel_num].monitor_enabled:
+            self.stop_monitoring()
+
         del self.channels[channel_num]
-
-

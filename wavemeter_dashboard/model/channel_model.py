@@ -31,7 +31,6 @@ class ChannelModel(QObject):
     on_reload = pyqtSignal()
 
     # signal to notify the backend
-    on_monitor_state_changed = pyqtSignal()
     on_expo_settings_changed = pyqtSignal()
     on_pid_settings_changed = pyqtSignal()
 
@@ -60,11 +59,10 @@ class ChannelModel(QObject):
 
         self.pid_enabled = False
         self.freq_setpoint = None
-        self.pid_p_prop_val = -1  # TODO: dimension??
-        self.pid_i_prop_val = 0
+        self.pid_p_prop_val = None
+        self.pid_i_prop_val = None
         self.pid_i = 0
         self.error = 0
-        self.error_longterm_data = {}
         self.dac_output = 0
         self.dac_longterm_data = {}
         self.dac_railed = False
@@ -94,6 +92,7 @@ class ChannelModel(QObject):
         return {
             'channel_num': self.channel_num,
             'channel_name': self.channel_name,
+            'monitor_enabled': self.monitor_enabled,
             'dac_channel_num': self.dac_channel_num,
             'channel_color': [self.channel_color.red(),
                               self.channel_color.green(),
@@ -114,6 +113,7 @@ class ChannelModel(QObject):
                        _dict['channel_color'][2])
         channel = ChannelModel(_dict['channel_num'], _dict['channel_name'],
                                color, _dict['dac_channel_num'])
+        channel.monitor_enabled = _dict['monitor_enabled']
         channel.pattern_enabled = _dict['pattern_enabled']
         channel.wide_pattern_enabled = _dict['wide_pattern_enabled']
         channel.expo_time = _dict['expo_time']

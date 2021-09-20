@@ -11,7 +11,15 @@
 - [x] dashboard: flash warning
 - [x] dashboard: edit channel
 - [x] dashboard: channel quick control
+- [x] [BUG] dashboard: mysterious floating graph on top left corner
+- [x] [BUG] dashboard: monitor button and add channel button still grey after dialog closed
+- [x] [BUG] channel setup: crash if not dac channel set
+- [x] [BUG] dashboard: color strip misplaced
+- [ ] monitor: determine wait time after setting exposure dynamically
+- [ ] dashboard: make the color strip less annoying when monitoring
 - [ ] channel view: emit warning
+- [ ] channel view: keep track of errors
+- [ ] channel view: display freq warning range
 - [ ] wavemeter: under-exposure over-exposure exception
 - [ ] monitor: pid out-of-lock text warning
 - [ ] monitor: pid railed text warning
@@ -21,11 +29,11 @@
 - [ ] dashboard: column width
 - [ ] dashboard: stacked widget
 - [ ] dashboard: scroll
-- [ ] wavemeter: get power data
 - [ ] big screen: mulit-plot display
 - [ ] big screen: freq display
 - [ ] monitor: single channel monitoring
 - [ ] big screen: channel settings
+- [ ] big screen: auto-exposure
 - [ ] dashboard: save layout
 - [ ] thumbnail: scroll zoom in/out
 - [ ] dashboard: dynamic thumbnail plot min/max adjustment

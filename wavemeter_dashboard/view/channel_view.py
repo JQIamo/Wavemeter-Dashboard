@@ -8,6 +8,7 @@ from PyQt5.QtCore import pyqtSignal
 from .widgets.freq_wavelength_label import FreqWavelengthLabel
 from .widgets.thumbnail_line_chart import ThumbnailLineChart
 from .widgets.channel_name_widget import ChannelNameWidget
+from .widgets.color_strip import ColorStrip
 from ..model.channel_model import ChannelModel
 
 if TYPE_CHECKING:
@@ -17,25 +18,33 @@ if TYPE_CHECKING:
 class ChannelView:
     long_term_time_window = 300
 
-    def __init__(self, dashboard: 'Dashboard', channel_model: ChannelModel):
+    def __init__(self, dashboard: 'Dashboard', channel_model: ChannelModel, color_strip: ColorStrip):
         self.channel_model = channel_model
         self.dashboard = dashboard
+        self.color_strip = color_strip
         self.channel_name_widget = ChannelNameWidget(
             self.dashboard,
             channel_model.channel_name, channel_model.channel_num,
             channel_model.channel_color)
+
         self.freq_label = FreqWavelengthLabel(self.dashboard)
         self.freq_label.frequency = 0
         self.pattern = ThumbnailLineChart(self.dashboard)
 
         self.freq_longterm = ThumbnailLineChart(self.dashboard)
-        self.error_longterm = ThumbnailLineChart(self.dashboard)
         self.dac_longterm = ThumbnailLineChart(self.dashboard)
+
+        self.channel_name_widget.hide()
+        self.freq_label.hide()
+        self.freq_longterm.hide()
+        self.dac_longterm.hide()
 
         self.rebind_model(channel_model)
 
         self.channel_name_widget.on_set_clicked.connect(self.show_channel_setup)
         self.channel_name_widget.on_mon_toggled.connect(self.toggle_monitor_state)
+
+        self.channel_name_widget.btn_mon_checked(channel_model.monitor_enabled)
 
     def rebind_model(self, model):
         self.channel_model = model
@@ -47,18 +56,12 @@ class ChannelView:
         model.on_pid_changed.connect(self.on_pid_changed)
 
     def on_freq_changed(self):
-        self.freq_label.frequency = self.channel_model.frequency
+        self.freq_label.frequency = self.channel_model.frequency * 1e12
         now = datetime.now().timestamp()
         self.freq_longterm.set_x_display_range(
             now - self.long_term_time_window, now)
         self.freq_longterm.update_longterm_data(
             self.channel_model.freq_longterm_data)
-
-        if self.channel_model.freq_setpoint:
-            self.error_longterm.set_x_display_range(
-                now - self.long_term_time_window, now)
-            self.error_longterm.update_longterm_data(
-                self.channel_model.error_longterm_data)
 
     def on_pattern_changed(self):
         max_amp = np.max(self.channel_model.pattern_data)
@@ -74,9 +77,14 @@ class ChannelView:
             now - self.long_term_time_window, now)
         self.dac_longterm.update_longterm_data(
             self.channel_model.dac_longterm_data)
-
+        
+        # if self.channel_model.dac_railed:
+        #     self.color_strip.flash_error()
+        # else:
+        #     self.color_strip.hide_error()  # TODO: keep track of error
+            
     def show_channel_setup(self):
         self.dashboard.on_set_channel_clicked(self.channel_model.channel_num)
 
     def toggle_monitor_state(self, on):
-        pass
+        self.channel_model.monitor_enabled = on

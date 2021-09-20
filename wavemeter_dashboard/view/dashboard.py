@@ -1,21 +1,21 @@
 from enum import Enum
+from typing import List, Dict
 
 from PyQt5.QtWidgets import QWidget, QLabel
 from .ui.ui_dashboard import Ui_dashboard
 from .widgets.misc import *
 from .widgets.add_channel_dialog import AddChannelDialog
-from .widgets.color_strip import ColorStrips
+from .widgets.color_strip import ColorStrip
 from .channel_view import ChannelView
 from wavemeter_dashboard.model.channel_model import ChannelModel
 from wavemeter_dashboard.config import config
 
 
 class ColumnType(Enum):
-    NAME = 0
-    FREQ = 1
-    PATTERN = 2
-    FREQ_LONGTERM = 3
-    PID_ERROR_LONGTERM = 4
+    NAME = 1
+    FREQ = 2
+    PATTERN = 3
+    FREQ_LONGTERM = 4
     PID_OUTPUT_LONGTERM = 5
     REMOVE = 6
 
@@ -25,8 +25,7 @@ column_name = {
     ColumnType.FREQ: 'FREQ',
     ColumnType.PATTERN: 'INTERFEROMETER',
     ColumnType.FREQ_LONGTERM: 'FREQ LONGTERM',
-    ColumnType.PID_ERROR_LONGTERM: 'ERR LONGTERM',
-    ColumnType.PID_OUTPUT_LONGTERM: 'CTR OUTPUT LONGTERM',
+    ColumnType.PID_OUTPUT_LONGTERM: 'FDBK LONGTERM',
     ColumnType.REMOVE: ''
 }
 
@@ -37,8 +36,7 @@ class Dashboard(QWidget):
         ColumnType.FREQ: 1,
         ColumnType.PATTERN: 2,
         ColumnType.FREQ_LONGTERM: 3,
-        ColumnType.PID_ERROR_LONGTERM: 4,
-        # ColumnType.PID_OUTPUT_LONGTERM: 5,
+        ColumnType.PID_OUTPUT_LONGTERM: 4,
         ColumnType.REMOVE: 5
     }
 
@@ -49,8 +47,8 @@ class Dashboard(QWidget):
     def __init__(self, parent, monitor):
         super().__init__(parent)
 
-        self.channels = []
-        self.color_strips = {}
+        self.channels: List[ChannelView] = []
+        self.color_strips: Dict[ColorStrip] = {}
         self.monitor = monitor
 
         self.pattern_max_amp = 0
@@ -58,6 +56,8 @@ class Dashboard(QWidget):
         self.setAutoFillBackground(True)
         self.ui = Ui_dashboard()
         self.ui.setupUi(self)
+
+        self.ui.monBtn.setEnabled(False)
 
         self.ui.channelGridLayout.setVerticalSpacing(self.vertical_spacing)
         self.ui.channelGridLayout.setHorizontalSpacing(self.horizontal_spacing)
@@ -70,8 +70,6 @@ class Dashboard(QWidget):
         self.ui.addChannelBtn.clicked.connect(self.on_add_channel_clicked)
         self.ui.monBtn.clicked.connect(self.on_monitor_toggled)
         self.ui.saveSettingsBtn.clicked.connect(self.save_channel_settings)
-
-        self.ui.monBtn.setEnabled(False)
 
         self.center_floating_widget = None
 
@@ -110,7 +108,9 @@ class Dashboard(QWidget):
             for chan in channels:
                 model = ChannelModel.from_settings_dict(chan)
                 self.add_channel(model)
-            self.ui.monBtn.setEnabled(False)
+
+            if self.channels:
+                self.ui.monBtn.setEnabled(True)
 
     def find_channel_by_num(self, num):
         filtered = list(filter(
@@ -123,27 +123,36 @@ class Dashboard(QWidget):
 
         return None
 
-    def add_channel(self, channel: ChannelModel):
-        self.ui.addChannelBtn.setEnabled(True)
+    def on_add_channel_dialog_apply(self, channel: ChannelModel):
         self.ui.saveSettingsBtn.setText("SAVE*")
-        self.ui.monBtn.setEnabled(True)
+
+        self.add_channel(channel)
+
+    def on_add_channel_dialog_close(self, status):
+        self.ui.addChannelBtn.setEnabled(True)
+        if self.channels:
+            self.ui.monBtn.setEnabled(True)
+
+    def add_channel(self, channel: ChannelModel):
+        if self.channels:
+            self.ui.monBtn.setEnabled(True)
 
         self._remove_channel_placeholder()
 
         old_ch = self.find_channel_by_num(channel.channel_num)
         if not old_ch:
-            view = ChannelView(self, channel)
-            self.channels.append(view)
-            self.color_strips[channel.channel_num] = ColorStrips(self)
+            color_strip = ColorStrip(self)
+            self.color_strips[channel.channel_num] = color_strip
+            view = ChannelView(self, channel, color_strip)
             self.monitor.add_channel(channel)
+            self.channels.append(view)
 
-            for col_type, widget in [
-                (ColumnType.NAME, view.channel_name_widget),
-                (ColumnType.FREQ, view.freq_label),
-                (ColumnType.PATTERN, view.pattern),
-                (ColumnType.FREQ_LONGTERM, view.freq_longterm),
-                (ColumnType.PID_ERROR_LONGTERM, view.error_longterm),
-                # (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm),
+            for col_type, widget, to_show in [
+                (ColumnType.NAME, view.channel_name_widget, True),
+                (ColumnType.FREQ, view.freq_label, True),
+                (ColumnType.PATTERN, view.pattern, True),
+                (ColumnType.FREQ_LONGTERM, view.freq_longterm, True),
+                (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm, True),
             ]:
                 self.ui.channelGridLayout.addWidget(
                     widget,
@@ -151,8 +160,11 @@ class Dashboard(QWidget):
                     self.column_num_map[col_type]
                 )
                 widget.setFixedHeight(self.row_height)
+                if to_show:
+                    widget.show()
 
-            self.resize_color_strips()
+            color_strip.flash_info()
+            self.resize(self.width(), self.height())
         else:
             self.monitor.remove_channel(channel.channel_num)
             self.monitor.add_channel(channel)
@@ -163,7 +175,8 @@ class Dashboard(QWidget):
         self.ui.addChannelBtn.setEnabled(False)
         self.ui.monBtn.setEnabled(False)
 
-        dialog.on_apply.connect(self.add_channel)
+        dialog.on_apply.connect(self.on_add_channel_dialog_apply)
+        dialog.on_close.connect(self.on_add_channel_dialog_close)
         dialog.show()
 
     def on_set_channel_clicked(self, channel_num):
@@ -176,7 +189,8 @@ class Dashboard(QWidget):
         self.ui.addChannelBtn.setEnabled(False)
         self.ui.monBtn.setEnabled(False)
 
-        dialog.on_apply.connect(self.add_channel)
+        dialog.on_apply.connect(self.on_add_channel_dialog_apply)
+        dialog.on_close.connect(self.on_add_channel_dialog_close)
         dialog.show()
 
     def display_message_box(self, title, message):

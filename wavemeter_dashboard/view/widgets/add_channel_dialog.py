@@ -42,9 +42,11 @@ class AddChannelDialog(Dialog):
             ui.expoEdit.setText(f"{model.expo_time:d}")
             ui.expo2Edit.setText(f"{model.expo2_time:d}")
             ui.pidBtn.setChecked(model.pid_enabled)
-            ui.setpointEdit.setText(f"{model.freq_setpoint}")
-            ui.pParamEdit.setText(f"{model.pid_p_prop_val}")
-            ui.iParamEdit.setText(f"{model.pid_i_prop_val}")
+
+            self.set_text_if_not_empty(ui.setpointEdit, model.freq_setpoint)
+            self.set_text_if_not_empty(ui.dacChanEdit, model.dac_channel_num)
+            self.set_text_if_not_empty(ui.pParamEdit, model.pid_p_prop_val)
+            self.set_text_if_not_empty(ui.iParamEdit, model.pid_i_prop_val)
 
     def on_auto_clicked(self):
         ui = self.widget.ui
@@ -109,22 +111,40 @@ class AddChannelDialog(Dialog):
             self.display_error("INVALID EXPO2")
 
         if self.widget.ui.pidBtn.isChecked():
-            try:
+            model.pid_enabled = True
+        else:
+            model.pid_enabled = False
+
+        try:
+            if model.pid_enabled or self.widget.ui.setpointEdit.text():
                 model.freq_setpoint = float(self.widget.ui.setpointEdit.text())
-            except ValueError:
-                self.display_error("INVALID FREQUENCY SETPOINT")
+        except ValueError:
+            self.display_error("INVALID FREQUENCY SETPOINT")
 
-            try:
+        try:
+            if model.pid_enabled or self.widget.ui.dacChanEdit.text():
+                model.dac_channel_num = int(self.widget.ui.dacChanEdit.text())
+        except ValueError:
+            self.display_error("INVALID DAC CHANNEL")
+
+        try:
+            if model.pid_enabled or self.widget.ui.pParamEdit.text():
                 model.pid_p_prop_val = float(self.widget.ui.pParamEdit.text())
-            except ValueError:
-                self.display_error("INVALID PID P PARAM")
+        except ValueError:
+            self.display_error("INVALID PID P PARAM")
 
-            try:
+        try:
+            if model.pid_enabled or self.widget.ui.iParamEdit.text():
                 model.pid_i_prop_val = float(self.widget.ui.iParamEdit.text())
-            except ValueError:
-                self.display_error("INVALID PID I PARAM")
+        except ValueError:
+            self.display_error("INVALID PID I PARAM")
 
         self.on_apply.emit(model)
 
         self.final_status = DialogStatus.OK
         self.close()
+
+    @staticmethod
+    def set_text_if_not_empty(edit, value):
+        if value is not None:
+            edit.setText(f"{value}")

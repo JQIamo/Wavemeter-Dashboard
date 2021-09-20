@@ -1,1 +1,1 @@
-from .dac import DAC
+from .dac import DAC, DACOutOfBoundException

@@ -14,7 +14,7 @@ class WarningBox(QLabel):
     pass
 
 
-class ColorStrips:
+class ColorStrip:
     flash_timer = QTimer()
 
     def __init__(self, parent):

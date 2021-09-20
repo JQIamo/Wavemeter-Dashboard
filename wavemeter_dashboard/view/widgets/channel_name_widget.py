@@ -23,3 +23,20 @@ class ChannelNameWidget(QWidget):
         self.ui.channNameLabel.change_name(channel_name, channel_num)
         self.ui.channNameLabel.change_background_color(color)
 
+    def btn_set_enable(self, enabled):
+        self.ui.setBtn.setEnabled(enabled)
+
+    def btn_mon_enable(self, enabled):
+        self.ui.monBtn.setEnabled(enabled)
+
+    def btn_mon_checked(self, checked):
+        self.ui.monBtn.setChecked(checked)
+
+    def is_btn_mon_checked(self):
+        return self.ui.monBtn.isChecked()
+
+    def set_active(self):
+        self.ui.indicatorLabel.setVisible(True)
+
+    def set_inactive(self):
+        self.ui.indicatorLabel.setVisible(False)

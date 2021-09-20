@@ -109,7 +109,7 @@ ErrorBox {
 }
 
 InfoBox {
-    background: #005ce6;
+    background: #0059b3;
 }
 
 WarningBox {
@@ -183,4 +183,5 @@ ChannelNameWidget QAbstractButton {
     min-height: 15px;
     padding: 2px;
     font-size: 12px;
+    border-left: none;
 }
