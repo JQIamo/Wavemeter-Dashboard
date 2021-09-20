@@ -102,7 +102,9 @@ class AddChannelDialog(Dialog):
         if not chan_name:
             chan_name = f"#{chan_num}"
 
-        model = ChannelModel(chan_num, chan_name)
+        model = self.channel_model
+        if not self.channel_model:
+            model = ChannelModel(chan_num, chan_name)
 
         if self.channel_model:
             model.channel_color = self.channel_model.channel_color
@@ -111,40 +113,57 @@ class AddChannelDialog(Dialog):
             model.expo_time = int(self.widget.ui.expoEdit.text())
         except ValueError:
             self.display_error("INVALID EXPO")
+            return
 
         try:
             model.expo2_time = int(self.widget.ui.expo2Edit.text())
         except ValueError:
             self.display_error("INVALID EXPO2")
+            return
 
-        if self.widget.ui.pidBtn.isChecked():
-            model.pid_enabled = True
-        else:
-            model.pid_enabled = False
+        model.pid_enabled = self.widget.ui.pidBtn.isChecked()
 
         try:
             if model.pid_enabled or self.widget.ui.setpointEdit.text():
                 model.freq_setpoint = convert_freq_to_number(self.widget.ui.setpointEdit.text())
         except ValueError:
             self.display_error("INVALID FREQUENCY SETPOINT")
+            return
 
         try:
             if model.pid_enabled or self.widget.ui.dacChanEdit.text():
                 model.dac_channel_num = int(self.widget.ui.dacChanEdit.text())
         except ValueError:
             self.display_error("INVALID DAC CHANNEL")
+            return
 
         try:
             if model.pid_enabled or self.widget.ui.pParamEdit.text():
                 model.pid_p_prop_val = float(self.widget.ui.pParamEdit.text())
         except ValueError:
             self.display_error("INVALID PID P PARAM")
+            return
 
         try:
             if model.pid_enabled or self.widget.ui.iParamEdit.text():
                 model.pid_i_prop_val = float(self.widget.ui.iParamEdit.text())
         except ValueError:
             self.display_error("INVALID PID I PARAM")
+            return
+
+        # alert section
+
+        model.error_alert_enabled = self.widget.ui.errAlertBtn.isChecked()
+        model.dac_railed_alert_enabled = self.widget.ui.dacRailedBtn.isChecked()
+        model.wmt_alert_enabled = self.widget.ui.wmtErrBtn.isChecked()
+
+        try:
+            if model.error_alert_enabled or self.widget.ui.errBoundEdit.text():
+                model.freq_max_error = convert_freq_to_number(
+                    self.widget.ui.errBoundEdit.text())
+        except ValueError:
+            self.display_error("INVALID ERROR BOUND")
+            return
 
         self.on_apply.emit(model)
 

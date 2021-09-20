@@ -220,7 +220,7 @@
      </widget>
     </item>
     <item row="0" column="2">
-     <widget class="CheckButton" name="lgErrBtn">
+     <widget class="CheckButton" name="errAlertBtn">
       <property name="text">
        <string>ON/OFF</string>
       </property>
@@ -229,12 +229,12 @@
     <item row="2" column="0">
      <widget class="QLabel" name="label_13">
       <property name="text">
-       <string>UNDER EXPO</string>
+       <string>WMT ERR</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1" colspan="2">
-     <widget class="CheckButton" name="underExpoBtn">
+     <widget class="CheckButton" name="wmtErrBtn">
       <property name="text">
        <string>ON/OFF</string>
       </property>

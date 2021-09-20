@@ -173,10 +173,6 @@ class Dashboard(QWidget):
 
             channel.on_new_alert.emit(ChannelAlertCode.IDLE)
             self.resize(self.width(), self.height())
-        else:
-            self.monitor.remove_channel(channel.channel_num)
-            self.monitor.add_channel(channel)
-            old_ch.rebind_model(channel)
 
     def on_add_channel_clicked(self):
         dialog = AddChannelDialog(self, self.monitor)
@@ -240,6 +236,8 @@ class Dashboard(QWidget):
     def on_monitoring_channel(self, channel_num):
         for chan in self.channels:
             if channel_num == chan.channel_model.channel_num:
+                chan.channel_model.on_channel_monitor_enabled.emit(True)
                 chan.channel_name_widget.set_active()
             else:
+                chan.channel_model.on_channel_monitor_enabled.emit(False)
                 chan.channel_name_widget.set_inactive()

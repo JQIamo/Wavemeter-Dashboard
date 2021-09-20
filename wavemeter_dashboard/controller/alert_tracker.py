@@ -99,14 +99,15 @@ class AlertTracker(QObject):
             channel.dismissed_alerts.remove(code)
 
         # restore alerts superseded by it
-        superseded = channel.superseded_alerts[code]
-        del channel.superseded_alerts[code]
+        if code in channel.superseded_alerts:
+            superseded = channel.superseded_alerts[code]
+            del channel.superseded_alerts[code]
 
-        for code in superseded:
-            # ensure not superseded by other alerts
-            if code not in chain(*channel.superseded_alerts.values()):
-                need_refresh = True
-                self._insert_into_active_alerts(channel, code)
+            for code in superseded:
+                # ensure not superseded by other alerts
+                if code not in chain(*channel.superseded_alerts.values()):
+                    need_refresh = True
+                    self._insert_into_active_alerts(channel, code)
 
         if need_refresh:
             channel.on_refresh_alert_display_requested.emit()

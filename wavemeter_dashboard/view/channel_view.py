@@ -42,7 +42,7 @@ class ChannelView:
         self.dac_longterm.hide()
         self.alert_label.hide()
 
-        self.rebind_model(channel_model)
+        self.bind_model(channel_model)
 
         self.channel_name_widget.on_set_clicked.connect(self.show_channel_setup)
         self.channel_name_widget.on_mon_toggled.connect(self.toggle_monitor_state)
@@ -73,7 +73,7 @@ class ChannelView:
             self.freq_longterm.remove_vertical_line("freq_max_error_high")
             self.freq_longterm.remove_vertical_line("freq_max_error_low")
 
-    def rebind_model(self, model):
+    def bind_model(self, model):
         self.channel_model = model
         self.channel_name_widget.set_name_color(model.channel_name,
                                                 model.channel_num,
@@ -107,7 +107,7 @@ class ChannelView:
             now - self.long_term_time_window, now)
         x, y = self.channel_model.dac_longterm_data.get_newest_point()
         limit = self.channel_model.dac_longterm_data.points_limit
-        self.freq_longterm.append_newest_point(x, y, limit)
+        self.dac_longterm.append_newest_point(x, y, limit)
         # self.dac_longterm.update_longterm_data(
         #     self.channel_model.dac_longterm_data)
 
@@ -118,6 +118,7 @@ class ChannelView:
         self.channel_model.monitor_enabled = on
 
     def change_alert_status(self, alert_status: ChannelAlertAction):
+        self.color_strip.hide()
         if alert_status == ChannelAlertAction.NOTHING:
             self.color_strip.hide()
         elif alert_status == ChannelAlertAction.STATIC_WARNING:

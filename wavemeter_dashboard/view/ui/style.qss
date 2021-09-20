@@ -93,7 +93,7 @@ ChannelPlaceholderPromptLabel {
     qproperty-alignment: AlignCenter;
 }
 
-BigContentLabel, FreqWavelengthLabel {
+FreqWavelengthLabel {
     font-size: 30px;
 }
 
@@ -206,4 +206,22 @@ ChannelNameWidget QAbstractButton {
     padding: 2px;
     font-size: 12px;
     border-left: none;
+}
+
+QMenu {
+    background-color: black; /* sets background of the menu */
+    border: 2px solid #e6e6e6;
+    border-right-color: #b3b3b3;
+    border-bottom-color: #b3b3b3;
+}
+
+QMenu::item {
+    /* sets background of menu item. set this to something non-transparent
+        if you want menu color and menu item color to be different */
+    color: white;
+    background-color: #4d4d4d;
+}
+
+QMenu::item:selected { /* when user selects item using mouse or keyboard */
+    background-color: #808080;
 }

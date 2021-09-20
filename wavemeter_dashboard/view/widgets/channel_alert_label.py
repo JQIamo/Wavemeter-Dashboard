@@ -65,7 +65,7 @@ class ChannelAlertLabel(QLabel):
         elif self.display_index < len(self.channel.active_alerts) \
                 + len(self.channel.dismissed_alerts):
             index = self.display_index - len(self.channel.dismissed_alerts)
-            alert_code = self.channel.active_alerts[index]
+            alert_code = self.channel.dismissed_alerts[index]
             alert = CHANNEL_ALERTS[alert_code]
             self.setText(alert.msg)
             self.state = "dismissed"
@@ -118,7 +118,7 @@ class ChannelAlertLabel(QLabel):
 
     def open_menu(self, point):
         if self.display_index < len(self.channel.active_alerts):
-            menu = QMenu()
+            menu = QMenu(self)
             dismiss_action = menu.addAction("DISMISS")
             action = menu.exec_(self.mapToGlobal(point))
             if action == dismiss_action:

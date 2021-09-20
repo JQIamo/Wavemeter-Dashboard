@@ -19,8 +19,8 @@ class ColorStrip:
 
     def __init__(self, parent):
         self.info_box = InfoBox(parent)
-        self.warning_box = InfoBox(parent)
-        self.error_box = InfoBox(parent)
+        self.warning_box = WarningBox(parent)
+        self.error_box = ErrorBox(parent)
 
         self.info_box.setVisible(False)
         self.warning_box.setVisible(False)

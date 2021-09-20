@@ -51,9 +51,9 @@ class LongtermData:
             idx += 1
 
     def get_newest_point(self):
-        idx = self.index
-        if self.index == len(self.time):
-            idx = 0
+        idx = self.index - 1
+        if self.index == -1:
+            idx = len(self.time) - 1
 
         return self.time[idx], self.values[idx]
 

@@ -44,11 +44,11 @@ def convert_freq_to_number(text: str, default_unit="THZ"):
 def convert_freq_for_display(freq):
     # max precision is 0.1 MHz
 
-    if freq > 1e12:
+    if freq >= 1e12:
         return f"{freq/1e12:.6f} THz"
-    elif freq > 1e9:
+    elif freq >= 1e9:
         return f"{freq/1e9:.3f} GHz"
-    elif freq > 1e6:
+    elif freq >= 1e6:
         return f"{freq/1e6:.1f} MHz"
     else:
         return "<1 MHz"
@@ -57,11 +57,11 @@ def convert_freq_for_display(freq):
 def convert_freq_for_forms(freq):
     # max precision is 0.1 MHz
 
-    if freq > 1e12:
+    if freq >= 1e12:
         return f"{freq/1e12:.6f} THz"
-    elif freq > 1e9:
+    elif freq >= 1e9:
         return f"{freq/1e9:.3f} GHz"
-    elif freq > 1e6:
+    elif freq >= 1e6:
         return f"{freq/1e6:.1f} MHz"
     else:
         return "0"

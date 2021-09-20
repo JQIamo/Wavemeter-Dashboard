@@ -1,6 +1,7 @@
 from typing import Dict
 import time
 from threading import Thread, Lock, Condition
+from functools import partial
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from wavemeter_dashboard.controller.wavemeter_ws7 import (
@@ -42,21 +43,31 @@ class Monitor(QObject):
         self.locked_wait_time = config.get('wait_time_before_locked', 10)
 
     def start_monitoring(self):
-        self.monitor_thread = Thread(name="Monitor", target=self._monitor)
+        self.monitor_thread = Thread(name="Monitor", target=self._monitor, daemon=True)
         self.monitor_thread.start()
         self.on_monitor_started.emit()
+
+    @staticmethod
+    def before_monitoring_channel_setup(channel: ChannelModel):
+        channel.on_new_alert.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
+
+        if channel.pid_enabled:
+            channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
+
+        channel.on_alert_cleared(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL)
+        channel.on_alert_cleared(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
+
+        channel.pid_i = 0
+        channel.deviate_since = 0
+        channel.stable_since = 0
 
     def _monitor(self):
         with self.monitoring_lock:
             for channel in self.channels.values():
-                channel.pid_i = 0
                 if not channel.monitor_enabled:
                     continue
 
-                channel.on_new_alert.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
-
-                if channel.pid_enabled:
-                    channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
+                self.before_monitoring_channel_setup(channel)
 
             self.wavemeter.set_auto_exposure(False)
             while not self.stop_monitoring_flag:
@@ -67,15 +78,21 @@ class Monitor(QObject):
                     if self.stop_monitoring_flag:
                         break
 
+                    # t = time.time()
                     self.on_monitoring_channel.emit(channel.channel_num)
                     channel.on_new_alert.emit(ChannelAlertCode.MONTIROING)
                     self._update_one_channel(channel.channel_num)
+                    channel.on_alert_cleared.emit(ChannelAlertCode.MONTIROING)
+                    # print(f"fps {1/(time.time() - t)}")
 
         self.stop_monitoring_flag = False
         self.last_monitored_channel = None
 
         for channel in self.channels.values():
             if channel.monitor_enabled:
+                channel.on_alert_cleared.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
+                channel.on_alert_cleared.emit(ChannelAlertCode.PID_ENGAGED)
+                channel.on_alert_cleared.emit(ChannelAlertCode.PID_LOCKED)
                 channel.on_new_alert.emit(ChannelAlertCode.IDLE)
 
         with self.monitor_stop_cv:
@@ -99,17 +116,16 @@ class Monitor(QObject):
             # we don't know how long it needs for the wavemeter to settle down
             # let's try for 300ms
             try:
-                time.sleep(0.05)
                 ch.frequency = self.wavemeter.get_frequency() * 1e12
                 success = True
                 break
-            except WavemeterWS7Exception:
+            except WavemeterWS7Exception as e:
                 pass
+            time.sleep(0.05)
 
         if not success:
             # last chance before throwing out errors
             try:
-                time.sleep(0.05)
                 ch.frequency = self.wavemeter.get_frequency() * 1e12
             except WavemeterWS7NoSignalException:
                 ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_NO_SIGNAL)
@@ -157,7 +173,7 @@ class Monitor(QObject):
 
                     if time.time() - ch.stable_since > self.locked_wait_time:
                         if ChannelAlertCode.PID_LOCKED not in ch.total_alerts:
-                            ch.on_new_alert(ChannelAlertCode.PID_LOCKED)
+                            ch.on_new_alert.emit(ChannelAlertCode.PID_LOCKED)
 
         ch.on_freq_changed.emit()
 
@@ -207,11 +223,25 @@ class Monitor(QObject):
             self.monitor_stop_cv.wait()
             self.on_monitor_stopped.emit()
 
-    def add_channel(self, channel):
+    def add_channel(self, channel: ChannelModel):
         # should be called by the frontend
         self.channels[channel.channel_num] = channel
+        channel.on_channel_monitor_enabled.connect(
+            partial(self.on_channel_monitor_enabled, channel.channel_num)
+        )
 
         return channel
+
+    def on_channel_monitor_enabled(self, channel_num, enabled):
+        if self.monitoring_lock.locked():
+            channel = self.channels[channel_num]
+
+            if enabled:
+                channel.on_new_alert.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
+                if channel.pid_enabled:
+                    channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
+            else:
+                channel.on_new_alert.emit(ChannelAlertCode.IDLE)
 
     def remove_channel(self, channel_num):
         # should be called by the frontend
@@ -221,6 +251,3 @@ class Monitor(QObject):
             self.stop_monitoring()
 
         del self.channels[channel_num]
-
-    def emit_channel_error(self, channel, error):
-        pass
