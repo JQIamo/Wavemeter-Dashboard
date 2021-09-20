@@ -32,6 +32,8 @@ class AddChannelDialog(Dialog):
         self.ui.applyBtn.clicked.connect(self.on_apply_clicked)
         self.widget.ui.autoExpoBtn.clicked.connect(self.on_auto_clicked)
 
+        self.widget.ui.removeChannelBtn.hide()
+
         return self.widget
 
     def _fill_in(self):

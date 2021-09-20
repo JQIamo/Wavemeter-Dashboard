@@ -45,7 +45,7 @@ class Dashboard(QWidget):
 
     row_height = 75
     vertical_spacing = 20
-    horizontal_spacing = 40
+    horizontal_spacing = 30
 
     def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker):
         super().__init__(parent)
@@ -152,20 +152,22 @@ class Dashboard(QWidget):
             self.alert_tracker.add_channel(channel)
             self.channels.append(view)
 
-            for col_type, widget, to_show in [
-                (ColumnType.NAME, view.channel_name_widget, True),
-                (ColumnType.FREQ, view.freq_label, True),
-                (ColumnType.PATTERN, view.pattern, True),
-                (ColumnType.FREQ_LONGTERM, view.freq_longterm, True),
-                (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm, True),
-                (ColumnType.STATUS, view.alert_label, True),
+            for col_type, widget, to_show, fix_height in [
+                (ColumnType.NAME, view.channel_name_widget, True, True),
+                (ColumnType.FREQ, view.freq_label, True, True),
+                (ColumnType.PATTERN, view.pattern, True, True),
+                (ColumnType.FREQ_LONGTERM, view.freq_longterm, True, True),
+                (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm, True, True),
+                (ColumnType.STATUS, view.alert_label, True, False),
             ]:
                 self.ui.channelGridLayout.addWidget(
                     widget,
                     len(self.channels),
                     self.column_num_map[col_type]
                 )
-                widget.setFixedHeight(self.row_height)
+                if fix_height:
+                    widget.setFixedHeight(self.row_height)
+
                 if to_show:
                     widget.show()
 

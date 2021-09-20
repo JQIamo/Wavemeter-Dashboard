@@ -35,7 +35,10 @@ class ChannelAlert:
         self.priority = alert_priority  # lowest: 0, highest: +infinity
         self.msg = alert_msg
         self.action = alert_action
-        self.supersede = supersede
+        if not supersede:
+            self.supersede = []
+        else:
+            self.supersede = supersede
 
 
 class ChannelWavemeterAlert(ChannelAlert):

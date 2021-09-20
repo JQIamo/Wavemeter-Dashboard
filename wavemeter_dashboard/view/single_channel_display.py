@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
 
+from .ui.ui_single_channel_display import Ui_singleChannelView
 from wavemeter_dashboard.controller.alert_tracker import AlertTracker
 from wavemeter_dashboard.controller.monitor import Monitor
 
@@ -10,4 +11,8 @@ class SingleChannelDisplay(QWidget):
 
         self.monitor = monitor
         self.alert_tracker = alert_tracker
+
+        self.ui = Ui_singleChannelView()
+        self.ui.setupUi(self)
+
 

@@ -1,8 +1,7 @@
 from typing import List
 from collections import namedtuple
-from PyQt5.QtWidgets import QLabel, pyqtProperty, pyqtSignal
-from PyQt5.QtGui import QMenu, QAction
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QMenu, QAction, QSizePolicy
+from PyQt5.QtCore import Qt, pyqtProperty, pyqtSignal
 
 from wavemeter_dashboard.model.channel_alert import ChannelAlert, ChannelAlertCode, CHANNEL_ALERTS, ChannelAlertAction
 from wavemeter_dashboard.model.channel_model import ChannelModel
@@ -17,9 +16,9 @@ class ChannelAlertLabel(QLabel):
         self.display_alert_code = None
         self.channel = channel_model
 
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        self.clicked.connect(self.next_alert)
         self.customContextMenuRequested.connect(self.open_menu)
 
     @pyqtProperty(str)
@@ -86,7 +85,10 @@ class ChannelAlertLabel(QLabel):
                 + len(self.channel.dismissed_alerts):
             self.display_index = 0
 
-        self.refresh()
+        self.display()
+
+    def mousePressEvent(self, event):
+        self.next_alert()
 
     def refresh_bg(self):
         self.style().unpolish(self)
@@ -96,7 +98,7 @@ class ChannelAlertLabel(QLabel):
         self.alerts.append(alert)
         self.display_index = len(self.alerts) - 1
 
-        self.refresh()
+        self.display()
 
     def remove_alert(self, alert: ChannelAlert):
         code = alert.code

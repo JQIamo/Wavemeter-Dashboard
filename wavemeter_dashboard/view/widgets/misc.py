@@ -11,6 +11,11 @@ from .flip_label import FlipLabel
 # case, I will put the format code here to avoid polluting elsewhere.
 
 
+class TitleLabel(QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+
 class BigContentLabel(QLabel):
     def __init__(self, parent):
         super().__init__(parent)

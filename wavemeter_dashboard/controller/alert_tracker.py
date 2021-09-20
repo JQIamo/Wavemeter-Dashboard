@@ -17,7 +17,7 @@ class AlertTracker(QObject):
 
     def add_channel(self, channel: ChannelModel):
         self.channels[channel.channel_num] = channel
-        channel.on_new_alert.connect(partial(self.add_channel, channel.channel_num))
+        channel.on_new_alert.connect(partial(self.add_alert, channel.channel_num))
         channel.on_alert_dismissed.connect(partial(self.dismiss_alert, channel.channel_num))
         channel.on_alert_cleared.connect(partial(self.clear_alert, channel.channel_num))
 
@@ -128,7 +128,7 @@ class AlertTracker(QObject):
         if not channel.active_alerts:
             new_action = ChannelAlertAction.NOTHING
         else:
-            new_action = channel.active_alerts[0]
+            new_action = CHANNEL_ALERTS[channel.active_alerts[0]].action
 
         if new_action != channel.channel_alert_action:
             channel.channel_alert_action = new_action
