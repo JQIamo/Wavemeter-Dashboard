@@ -163,7 +163,6 @@ class Dashboard(QWidget):
                 if to_show:
                     widget.show()
 
-            color_strip.flash_info()
             self.resize(self.width(), self.height())
         else:
             self.monitor.remove_channel(channel.channel_num)
@@ -230,8 +229,8 @@ class Dashboard(QWidget):
         self.ui.saveSettingsBtn.setText("SAVE")
 
     def on_monitoring_channel(self, channel_num):
-        for num, strip in self.color_strips.items():
-            if num == channel_num:
-                strip.show_info()
+        for chan in self.channels:
+            if channel_num == chan.channel_model.channel_num:
+                chan.channel_name_widget.set_active()
             else:
-                strip.hide_info()
+                chan.channel_name_widget.set_inactive()
