@@ -6,6 +6,7 @@ from wavemeter_dashboard.view.widgets.dialog import Dialog, DialogStatus
 from wavemeter_dashboard.view.widgets.channel_setup import ChannelSetup
 from wavemeter_dashboard.model.channel_model import ChannelModel
 from wavemeter_dashboard.controller.monitor import Monitor
+from wavemeter_dashboard.util import convert_freq_for_forms, convert_freq_to_number
 
 if TYPE_CHECKING:
     from wavemeter_dashboard.view.dashboard import Dashboard
@@ -43,7 +44,11 @@ class AddChannelDialog(Dialog):
             ui.expo2Edit.setText(f"{model.expo2_time:d}")
             ui.pidBtn.setChecked(model.pid_enabled)
 
-            self.set_text_if_not_empty(ui.setpointEdit, model.freq_setpoint)
+            if model.freq_setpoint:
+                ui.setpointEdit.setText(convert_freq_for_forms(model.freq_setpoint))
+            if model.freq_max_error:
+                ui.errBoundEdit.setText(convert_freq_for_forms(model.freq_max_error))
+
             self.set_text_if_not_empty(ui.dacChanEdit, model.dac_channel_num)
             self.set_text_if_not_empty(ui.pParamEdit, model.pid_p_prop_val)
             self.set_text_if_not_empty(ui.iParamEdit, model.pid_i_prop_val)
@@ -117,7 +122,7 @@ class AddChannelDialog(Dialog):
 
         try:
             if model.pid_enabled or self.widget.ui.setpointEdit.text():
-                model.freq_setpoint = float(self.widget.ui.setpointEdit.text())
+                model.freq_setpoint = convert_freq_to_number(self.widget.ui.setpointEdit.text())
         except ValueError:
             self.display_error("INVALID FREQUENCY SETPOINT")
 

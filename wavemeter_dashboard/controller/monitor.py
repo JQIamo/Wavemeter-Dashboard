@@ -76,7 +76,7 @@ class Monitor(QObject):
             # let's try for 300ms
             try:
                 time.sleep(0.5)
-                ch.frequency = self.wavemeter.get_frequency()
+                ch.frequency = self.wavemeter.get_frequency() * 1e12
             except WavemeterWS7Exception as e:
                 if attempt < max_attempts - 1:
                     pass
@@ -101,9 +101,9 @@ class Monitor(QObject):
             ch.on_wide_pattern_changed.emit()
 
         if ch.pid_enabled and ch.freq_setpoint:
-            ch.pid_i += ch.error  # TODO: * delta
+            ch.pid_i += ch.error / 1e12  # TODO: * delta
             prev_dac_output = self.dac.get_dac_value(ch.dac_channel_num)
-            output = prev_dac_output + ch.pid_p_prop_val * ch.error + ch.pid_i_prop_val * ch.pid_i
+            output = prev_dac_output + ch.pid_p_prop_val * ch.error / 1e12 + ch.pid_i_prop_val * ch.pid_i
 
             if self.dac.DAC_MIN <= output <= self.dac.DAC_MAX:
                 self.dac.set_dac_value(ch.dac_channel_num, output)

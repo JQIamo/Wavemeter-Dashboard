@@ -191,17 +191,17 @@
     <item row="0" column="0">
      <widget class="QLabel" name="label_11">
       <property name="text">
-       <string>LARGE ERROR</string>
+       <string>ERROR BOUND</string>
       </property>
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QLineEdit" name="lgErrEdit">
+     <widget class="QLineEdit" name="errBoundEdit">
       <property name="text">
        <string/>
       </property>
       <property name="placeholderText">
-       <string>THz</string>
+       <string/>
       </property>
      </widget>
     </item>

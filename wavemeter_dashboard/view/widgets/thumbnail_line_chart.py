@@ -1,6 +1,6 @@
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
 from PyQt5.QtGui import QColor, QPen, QPainter
-from PyQt5.QtCore import QRectF
+from PyQt5.QtCore import QRectF, Qt
 
 
 class ThumbnailLineChart(QChartView):
@@ -10,11 +10,15 @@ class ThumbnailLineChart(QChartView):
         self.setRenderHint(QPainter.Antialiasing)
         self.series = QLineSeries()
         self.chart = QChart()
+        self.lines = {}
 
         self.chart.legend().hide()
         self.chart.layout().setContentsMargins(0, 0, 0, 0)
         self.chart.setBackgroundRoundness(0)
         self.chart.setBackgroundVisible(False)
+
+        self.x_min = 0
+        self.x_max = 0
 
         self.x_axis = QValueAxis()
         self.y_axis = QValueAxis()
@@ -39,6 +43,9 @@ class ThumbnailLineChart(QChartView):
     def update_data(self, xs, ys):
         self.clear_series()
 
+        self.x_min = min(xs)
+        self.y_min = max(xs)
+
         for x, y in zip(xs, ys):
             self.series.append(x, y)
 
@@ -50,6 +57,36 @@ class ThumbnailLineChart(QChartView):
         self._transfer_longterm_data(self.series.append, longterm_dict)
 
         self.chart.addSeries(self.series)
+
+    def add_vertical_line(self, name, pos, color, dash=False):
+        if name in self.lines:
+            self.remove_vertical_line(name)
+
+        series = QLineSeries()
+        pen = series.pen()
+        pen.setWidth(1)
+        pen.setColor(color)
+        if dash:
+            pen.setStyle(Qt.DashLine)
+        series.setPen(pen)
+        self.lines[name] = (pos, series)
+        series.append(self.x_min, pos)
+        series.append(self.x_max, pos)
+        self.chart.addSeries(series)
+
+    def update_vertical_lines(self):
+        for name, (pos, series) in self.lines:
+            self.chart.removeSeries(series)
+            series.clear()
+            series.append(self.x_min, pos)
+            series.append(self.x_max, pos)
+            self.chart.addSeries(series)
+
+    def remove_vertical_line(self, name):
+        if name not in self.lines:
+            return
+        self.chart.removeSeries(self.lines[name][1])
+        del self.lines[name]
 
     def clear_series(self):
         self.chart.removeSeries(self.series)
@@ -66,12 +103,13 @@ class ThumbnailLineChart(QChartView):
         self.chart.setPlotArea(QRectF(0, 0,
                                       self.width(), self.height()))
 
-    @staticmethod
-    def _transfer_longterm_data(append_method, var):
+    def _transfer_longterm_data(self, append_method, var):
         assert 'index' in var and 'values' in var and 'time' in var
 
         count = len(var['values'])
         idx = var['index']
+
+        self.x_min = var['values'][idx]
 
         for i in range(count):
             if idx == count:
@@ -79,3 +117,5 @@ class ThumbnailLineChart(QChartView):
 
             append_method(var['time'][idx], var['values'][idx])
             idx += 1
+
+        self.x_max = var['values'][idx - 1]

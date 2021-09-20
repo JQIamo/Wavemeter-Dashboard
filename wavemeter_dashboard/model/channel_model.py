@@ -59,6 +59,7 @@ class ChannelModel(QObject):
 
         self.pid_enabled = False
         self.freq_setpoint = None
+        self.freq_max_error = None
         self.pid_p_prop_val = None
         self.pid_i_prop_val = None
         self.pid_i = 0
@@ -103,6 +104,7 @@ class ChannelModel(QObject):
             'expo2_time': self.expo2_time,
             'pid_enabled': self.pid_enabled,
             'freq_setpoint': self.freq_setpoint,
+            'freq_max_error': self.freq_max_error,
             'pid_i_prop_val': self.pid_i_prop_val,
             'pid_p_prop_val': self.pid_p_prop_val
         }
@@ -120,6 +122,7 @@ class ChannelModel(QObject):
         channel.expo2_time = _dict['expo2_time']
         channel.pid_enabled = _dict['pid_enabled']
         channel.freq_setpoint = _dict['freq_setpoint']
+        channel.freq_max_error = _dict['freq_max_error']
         channel.pid_i_prop_val = _dict['pid_i_prop_val']
         channel.pid_p_prop_val = _dict['pid_p_prop_val']
 
