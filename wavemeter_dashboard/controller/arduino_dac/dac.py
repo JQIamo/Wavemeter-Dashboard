@@ -21,14 +21,19 @@ class DAC:
         self.serial.write(w.encode("utf-8") + b"\n")
 
     def is_railed(self, ch):
-        return self.DAC_MIN <= self.get_dac_value(ch) < self.DAC_MAX
+        return self.DAC_MIN < self.get_dac_value(ch) < self.DAC_MAX
 
     def get_dac_value(self, ch):
         return int(self.query(f"Q {ch}"))
 
     def set_dac_value(self, ch, val):
-        if self.DAC_MIN <= val < self.DAC_MAX:
+        if val <= self.DAC_MIN:
+            self.write(f"S {ch} {self.DAC_MIN}")
             raise DACOutOfBoundException
+        elif val >= self.DAC_MAX:
+            self.write(f"S {ch} {self.DAC_MAX}")
+            raise DACOutOfBoundException
+
         self.write(f"S {ch} {val}")
 
     def set_dac_inc(self, ch, inc):

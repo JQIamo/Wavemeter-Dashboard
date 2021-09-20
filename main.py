@@ -4,6 +4,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QScrollArea
 from PyQt5.QtCore import Qt, QCoreApplication
 
+from wavemeter_dashboard.controller.alert_tracker import AlertTracker
 from wavemeter_dashboard.view.dashboard import Dashboard
 from wavemeter_dashboard.controller.monitor import Monitor
 from wavemeter_dashboard.controller.wavemeter_ws7 import WavemeterWS7
@@ -42,18 +43,19 @@ if __name__ == "__main__":
     fbs_port = config.config.get("fiberswitch_com_port")
     dac_port = config.config.get("dac_com_port")
 
-    wm = WavemeterWS7()
-    fs = FiberSwitch(fbs_port)
-    dac = DAC(dac_port)
+    # wm = WavemeterWS7()
+    # fs = FiberSwitch(fbs_port)
+    # dac = DAC(dac_port)
 
-    # wm = None
-    # fs = None
-    # dac = None
+    wm = None
+    fs = None
+    dac = None
 
     monitor = Monitor(wm, fs, dac)
+    alert_tracker = AlertTracker()
     scroll = QScrollArea(window)
     scroll.setWidgetResizable(True)
-    dashboard = Dashboard(window, monitor)
+    dashboard = Dashboard(window, monitor, alert_tracker)
     scroll.setWidget(dashboard)
 
     window.setCentralWidget(scroll)

@@ -9,6 +9,9 @@ from .widgets.color_strip import ColorStrip
 from .channel_view import ChannelView
 from wavemeter_dashboard.model.channel_model import ChannelModel
 from wavemeter_dashboard.config import config
+from ..controller.alert_tracker import AlertTracker
+from ..controller.monitor import Monitor
+from ..model.channel_alert import ChannelAlertCode
 
 
 class ColumnType(Enum):
@@ -17,7 +20,7 @@ class ColumnType(Enum):
     PATTERN = 3
     FREQ_LONGTERM = 4
     PID_OUTPUT_LONGTERM = 5
-    REMOVE = 6
+    STATUS = 6
 
 
 column_name = {
@@ -26,7 +29,7 @@ column_name = {
     ColumnType.PATTERN: 'INTERFEROMETER',
     ColumnType.FREQ_LONGTERM: 'FREQ LONGTERM',
     ColumnType.PID_OUTPUT_LONGTERM: 'FDBK LONGTERM',
-    ColumnType.REMOVE: ''
+    ColumnType.STATUS: 'STATUS'
 }
 
 
@@ -37,19 +40,20 @@ class Dashboard(QWidget):
         ColumnType.PATTERN: 2,
         ColumnType.FREQ_LONGTERM: 3,
         ColumnType.PID_OUTPUT_LONGTERM: 4,
-        ColumnType.REMOVE: 5
+        ColumnType.STATUS: 5
     }
 
     row_height = 75
     vertical_spacing = 20
     horizontal_spacing = 40
 
-    def __init__(self, parent, monitor):
+    def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker):
         super().__init__(parent)
 
         self.channels: List[ChannelView] = []
         self.color_strips: Dict[ColorStrip] = {}
         self.monitor = monitor
+        self.alert_tracker = alert_tracker
 
         self.pattern_max_amp = 0
 
@@ -145,6 +149,7 @@ class Dashboard(QWidget):
             self.color_strips[channel.channel_num] = color_strip
             view = ChannelView(self, channel, color_strip)
             self.monitor.add_channel(channel)
+            self.alert_tracker.add_channel(channel)
             self.channels.append(view)
 
             for col_type, widget, to_show in [
@@ -153,6 +158,7 @@ class Dashboard(QWidget):
                 (ColumnType.PATTERN, view.pattern, True),
                 (ColumnType.FREQ_LONGTERM, view.freq_longterm, True),
                 (ColumnType.PID_OUTPUT_LONGTERM, view.dac_longterm, True),
+                (ColumnType.STATUS, view.alert_label, True),
             ]:
                 self.ui.channelGridLayout.addWidget(
                     widget,
@@ -163,6 +169,7 @@ class Dashboard(QWidget):
                 if to_show:
                     widget.show()
 
+            channel.on_new_alert.emit(ChannelAlertCode.IDLE)
             self.resize(self.width(), self.height())
         else:
             self.monitor.remove_channel(channel.channel_num)

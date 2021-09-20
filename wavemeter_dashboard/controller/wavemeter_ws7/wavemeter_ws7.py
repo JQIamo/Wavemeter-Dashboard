@@ -10,8 +10,24 @@ class WavemeterWS7Exception(Exception):
     pass
 
 
+class WavemeterWS7BadSignalException(WavemeterWS7Exception):
+    pass
+
+
+class WavemeterWS7NoSignalException(WavemeterWS7Exception):
+    pass
+
+
+class WavemeterWS7LowSignalException(WavemeterWS7Exception):
+    pass
+
+
+class WavemeterWS7HighSignalException(WavemeterWS7Exception):
+    pass
+
+
 class WavemeterWS7:
-    def __init__(self, logger=None):
+    def __init__(self):
         try:
             api.LoadDLL(DLL_PATH)
         except Exception:
@@ -34,13 +50,13 @@ class WavemeterWS7:
         if frequency == const.ErrWlmMissing:
             raise WavemeterWS7Exception("WLM inactive")
         elif frequency == const.ErrNoSignal:
-            raise WavemeterWS7Exception('No Signal')
+            raise WavemeterWS7NoSignalException
         elif frequency == const.ErrBadSignal:
-            raise WavemeterWS7Exception('Bad Signal')
+            raise WavemeterWS7BadSignalException
         elif frequency == const.ErrLowSignal:
-            raise WavemeterWS7Exception('Low Signal')
+            raise WavemeterWS7LowSignalException
         elif frequency == const.ErrBigSignal:
-            raise WavemeterWS7Exception('High Signal')
+            raise WavemeterWS7HighSignalException
 
         return frequency
 

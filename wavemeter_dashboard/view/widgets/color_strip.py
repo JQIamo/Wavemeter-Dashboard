@@ -54,6 +54,14 @@ class ColorStrip:
         self.info_box.show()
         self.info_box.lower()
 
+    def hide(self):
+        self.info_box.setVisible(False)
+        self.warning_box.setVisible(False)
+        self.error_box.setVisible(False)
+        self.info_flashing = False
+        self.warning_flashing = False
+        self.error_flashing = False
+
     def hide_info(self):
         self.info_flashing = False
         self.info_box.setVisible(False)

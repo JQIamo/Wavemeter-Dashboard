@@ -15,20 +15,20 @@
 - [x] [BUG] dashboard: monitor button and add channel button still grey after dialog closed
 - [x] [BUG] channel setup: crash if not dac channel set
 - [x] [BUG] dashboard: color strip misplaced
-- [ ] monitor: determine wait time after setting exposure dynamically
-- [ ] dashboard: make the color strip less annoying when monitoring
-- [ ] channel view: emit warning
-- [ ] channel view: keep track of errors
-- [ ] channel view: display freq warning range
-- [ ] wavemeter: under-exposure over-exposure exception
-- [ ] monitor: pid out-of-lock text warning
-- [ ] monitor: pid railed text warning
+- [x] monitor: determine wait time after setting exposure dynamically
+- [x] dashboard: make the color strip less annoying when monitoring
+- [x] channel view: emit warning
+- [x] channel view: keep track of errors
+- [x] channel view: display freq warning range
+- [x] wavemeter: under-exposure over-exposure exception
+- [x] monitor: pid out-of-lock text warning
+- [x] monitor: pid railed text warning
 - [ ] dashboard: remove channel from monitoring
 - [ ] dashboard: delete channel
 - [ ] dashboard: add/delete columns dialog
 - [ ] dashboard: column width
 - [ ] dashboard: stacked widget
-- [ ] dashboard: scroll
+- [x] dashboard: scroll
 - [ ] big screen: mulit-plot display
 - [ ] big screen: freq display
 - [ ] monitor: single channel monitoring

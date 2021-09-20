@@ -1,5 +1,5 @@
 {
-    "after_switch_wait_time": 0.2,
+    "wait_time_after_switch": 0.2,
     "channels": [
         {
             "channel_color": [
@@ -64,5 +64,7 @@
     ],
     "dac_com_port": "COM8",
     "fiberswitch_com_port": "COM5",
-    "longterm_length_limit": 200
+    "longterm_length_limit": 200,
+    "wait_time_before_out_of_lock_error": 5,
+    "wait_time_before_deviating_warning": 10
 }

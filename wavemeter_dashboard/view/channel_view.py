@@ -3,14 +3,14 @@ from datetime import datetime
 import random
 import numpy as np
 
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QColor
 
+from .widgets.channel_alert_label import ChannelAlertLabel
 from .widgets.freq_wavelength_label import FreqWavelengthLabel
 from .widgets.thumbnail_line_chart import ThumbnailLineChart
 from .widgets.channel_name_widget import ChannelNameWidget
 from .widgets.color_strip import ColorStrip
-from .widgets.misc import ErrorLabel
+from ..model.channel_alert import ChannelAlertAction
 from ..model.channel_model import ChannelModel
 
 if TYPE_CHECKING:
@@ -34,13 +34,13 @@ class ChannelView:
         self.pattern = ThumbnailLineChart(self.dashboard)
         self.freq_longterm = ThumbnailLineChart(self.dashboard)
         self.dac_longterm = ThumbnailLineChart(self.dashboard)
-        self.error_label = ErrorLabel(self.dashboard)
+        self.alert_label = ChannelAlertLabel(self.dashboard, channel_model)
 
         self.channel_name_widget.hide()
         self.freq_label.hide()
         self.freq_longterm.hide()
         self.dac_longterm.hide()
-        self.error_label.hide()
+        self.alert_label.hide()
 
         self.rebind_model(channel_model)
 
@@ -48,6 +48,9 @@ class ChannelView:
         self.channel_name_widget.on_mon_toggled.connect(self.toggle_monitor_state)
 
         self.channel_name_widget.btn_mon_checked(channel_model.monitor_enabled)
+
+        self.channel_model.on_channel_alert_action_changed.connect(self.change_alert_status)
+        self.channel_model.on_refresh_alert_display_requested.connect(self.alert_label.update)
 
     def rebind_model(self, model):
         self.channel_model = model
@@ -101,14 +104,21 @@ class ChannelView:
             now - self.long_term_time_window, now)
         self.dac_longterm.update_longterm_data(
             self.channel_model.dac_longterm_data)
-        
-        # if self.channel_model.dac_railed:
-        #     self.color_strip.flash_error()
-        # else:
-        #     self.color_strip.hide_error()  # TODO: keep track of error
-            
+
     def show_channel_setup(self):
         self.dashboard.on_set_channel_clicked(self.channel_model.channel_num)
 
     def toggle_monitor_state(self, on):
         self.channel_model.monitor_enabled = on
+
+    def change_alert_status(self, alert_status: ChannelAlertAction):
+        if alert_status == ChannelAlertAction.NOTHING:
+            self.color_strip.hide()
+        elif alert_status == ChannelAlertAction.STATIC_WARNING:
+            self.color_strip.show_warning()
+        elif alert_status == ChannelAlertAction.STATIC_ERROR:
+            self.color_strip.show_error()
+        elif alert_status == ChannelAlertAction.FLASH_WARNING:
+            self.color_strip.flash_warning()
+        elif alert_status == ChannelAlertAction.FLASH_ERROR:
+            self.color_strip.flash_error()

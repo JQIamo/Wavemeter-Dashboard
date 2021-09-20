@@ -1,11 +1,16 @@
+from typing import Dict
 import time
 from threading import Thread, Lock, Condition
 from PyQt5.QtCore import pyqtSignal, QObject
 
-from wavemeter_dashboard.controller.wavemeter_ws7 import WavemeterWS7, WavemeterWS7Exception
+from wavemeter_dashboard.controller.wavemeter_ws7 import (
+    WavemeterWS7, WavemeterWS7Exception,
+    WavemeterWS7BadSignalException, WavemeterWS7LowSignalException,
+    WavemeterWS7NoSignalException, WavemeterWS7HighSignalException)
 from wavemeter_dashboard.controller.fiber_switch import FiberSwitch
 from wavemeter_dashboard.controller.arduino_dac import DAC, DACOutOfBoundException
 from wavemeter_dashboard.config import config
+from wavemeter_dashboard.model.channel_alert import ChannelAlertCode
 from wavemeter_dashboard.model.channel_model import ChannelModel
 
 
@@ -23,7 +28,7 @@ class Monitor(QObject):
         self.dac = dac
 
         self.monitor_thread = None
-        self.channels = {}
+        self.channels: Dict[ChannelModel] = {}
 
         self.stop_monitoring_flag = False
         self.monitoring_lock = Lock()
@@ -31,7 +36,10 @@ class Monitor(QObject):
 
         self.last_monitored_channel = None
 
-        self.after_switch_wait_time = config.get('after_switch_wait_time', 0.2)
+        self.after_switch_wait_time = config.get('wait_time_after_switch', 0.2)
+        self.deviate_warning_wait_time = config.get('wait_time_before_deviate_warning', 5)
+        self.out_of_lock_error_wait_time = config.get('wait_time_before_out_of_lock_error', 10)
+        self.locked_wait_time = config.get('wait_time_before_locked', 10)
 
     def start_monitoring(self):
         self.monitor_thread = Thread(name="Monitor", target=self._monitor)
@@ -40,6 +48,16 @@ class Monitor(QObject):
 
     def _monitor(self):
         with self.monitoring_lock:
+            for channel in self.channels.values():
+                channel.pid_i = 0
+                if not channel.monitor_enabled:
+                    continue
+
+                channel.on_new_alert.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
+
+                if channel.pid_enabled:
+                    channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
+
             self.wavemeter.set_auto_exposure(False)
             while not self.stop_monitoring_flag:
                 for channel in self.channels.values():
@@ -50,10 +68,15 @@ class Monitor(QObject):
                         break
 
                     self.on_monitoring_channel.emit(channel.channel_num)
+                    channel.on_new_alert.emit(ChannelAlertCode.MONTIROING)
                     self._update_one_channel(channel.channel_num)
 
         self.stop_monitoring_flag = False
         self.last_monitored_channel = None
+
+        for channel in self.channels.values():
+            if channel.monitor_enabled:
+                channel.on_new_alert.emit(ChannelAlertCode.IDLE)
 
         with self.monitor_stop_cv:
             self.monitor_stop_cv.notify_all()
@@ -68,27 +91,73 @@ class Monitor(QObject):
             self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
             self.last_monitored_channel = ch
         else:
-            time.sleep(0.2)  # stop the PC from burning
+            time.sleep(0.1)  # stop the PC from burning
 
+        success = False
         max_attempts = 6
-        for attempt in range(max_attempts):
+        for attempt in range(max_attempts - 1):
             # we don't know how long it needs for the wavemeter to settle down
             # let's try for 300ms
             try:
-                time.sleep(0.5)
+                time.sleep(0.05)
                 ch.frequency = self.wavemeter.get_frequency() * 1e12
-            except WavemeterWS7Exception as e:
-                if attempt < max_attempts - 1:
-                    pass
-                else:
-                    self.emit_channel_error(ch, e)
-                    # self.on_channel_error.emit(channel_num, f"Channel {channel_num} error: {e}")
-                    return
+                success = True
+                break
+            except WavemeterWS7Exception:
+                pass
+
+        if not success:
+            # last chance before throwing out errors
+            try:
+                time.sleep(0.05)
+                ch.frequency = self.wavemeter.get_frequency() * 1e12
+            except WavemeterWS7NoSignalException:
+                ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_NO_SIGNAL)
+            except WavemeterWS7BadSignalException:
+                ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_BAD_SIGNAL)
+            except WavemeterWS7HighSignalException:
+                ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_OVER_EXPOSED)
+            except WavemeterWS7LowSignalException:
+                ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_UNDER_EXPOSED)
+            except WavemeterWS7Exception:
+                ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_UNKNOWN_ERROR)
 
         ch.freq_longterm_data.append(ch.frequency)
 
         if ch.freq_setpoint:
             ch.error = ch.frequency - ch.freq_setpoint
+            if ch.freq_max_error:
+                if abs(ch.error) > ch.freq_max_error:
+                    ch.stable_since = 0
+                    if ch.deviate_since == 0:
+                        ch.deviate_since = time.time()
+
+                    time_elapsed = time.time() - ch.deviate_since
+                    if time_elapsed > self.out_of_lock_error_wait_time:
+                        if ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING \
+                                not in ch.total_alerts:
+                            ch.on_new_alert.emit(
+                                ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
+                    elif time_elapsed > self.deviate_warning_wait_time:
+                        if ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL\
+                                not in ch.total_alerts:
+                            ch.on_alert_cleared.emit(ChannelAlertCode.PID_LOCKED)
+                            ch.on_new_alert.emit(
+                                ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL)
+                else:
+                    ch.deviate_since = 0
+                    if ch.stable_since == 0:
+                        ch.stable_since = time.time()
+                        if ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING in ch.total_alerts or \
+                                ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL in ch.total_alerts:
+                            ch.on_alert_cleared.emit(
+                                ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL)
+                            ch.on_alert_cleared.emit(
+                                ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
+
+                    if time.time() - ch.stable_since > self.locked_wait_time:
+                        if ChannelAlertCode.PID_LOCKED not in ch.total_alerts:
+                            ch.on_new_alert(ChannelAlertCode.PID_LOCKED)
 
         ch.on_freq_changed.emit()
 
@@ -101,15 +170,18 @@ class Monitor(QObject):
             ch.on_wide_pattern_changed.emit()
 
         if ch.pid_enabled and ch.freq_setpoint:
-            ch.pid_i += ch.error / 1e12  # TODO: * delta
+            if ch.pid_i_last_time != 0:
+                ch.pid_i += ch.error / 1e12 * time.time() - ch.pid_i_last_time
             prev_dac_output = self.dac.get_dac_value(ch.dac_channel_num)
             output = prev_dac_output + ch.pid_p_prop_val * ch.error / 1e12 + ch.pid_i_prop_val * ch.pid_i
+            ch.pid_i_last_time = time.time()
 
-            if self.dac.DAC_MIN <= output <= self.dac.DAC_MAX:
+            try:
                 self.dac.set_dac_value(ch.dac_channel_num, output)
                 ch.dac_railed = False
-            else:
+            except DACOutOfBoundException:
                 ch.dac_railed = True
+                ch.on_new_alert.emit(ChannelAlertCode.PID_DAC_RAILED)
 
             ch.dac_output = output
             ch.dac_longterm_data.append(output)

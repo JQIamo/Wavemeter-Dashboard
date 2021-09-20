@@ -99,9 +99,31 @@ BigContentLabel, FreqWavelengthLabel {
 
 ErrorLabel {
     background: #ff0000;
-    min-height: 60px;
+    min-height: 50px;
     font-size: 20px;
     qproperty-alignment: AlignCenter;
+}
+
+ChannelAlertLabel {
+    background: transparent;
+    min-height: 50px;
+    min-width: 250px;
+    font-size: 20px;
+    qproperty-alignment: AlignCenter;
+
+    border: 2px solid #e6e6e6;
+}
+
+ChannelAlertLabel[state = "normal"] {
+    background: transparent;
+}
+
+ChannelAlertLabel[state = "warning"] {
+    background: #ff6600;
+}
+
+ChannelAlertLabel[state = "error"] {
+    background: #ff0000;
 }
 
 ErrorBox {
