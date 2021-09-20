@@ -9,6 +9,8 @@
 - [x] monitor: set auto exposure params when switching
 - [x] dashboard: channel strip background
 - [x] dashboard: flash warning
+- [x] dashboard: edit channel
+- [x] dashboard: channel quick control
 - [ ] channel view: emit warning
 - [ ] wavemeter: under-exposure over-exposure exception
 - [ ] monitor: pid out-of-lock text warning
@@ -18,6 +20,7 @@
 - [ ] dashboard: add/delete columns dialog
 - [ ] dashboard: column width
 - [ ] dashboard: stacked widget
+- [ ] dashboard: scroll
 - [ ] wavemeter: get power data
 - [ ] big screen: mulit-plot display
 - [ ] big screen: freq display

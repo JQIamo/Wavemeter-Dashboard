@@ -18,17 +18,33 @@ class AddChannelDialog(Dialog):
     on_apply = pyqtSignal(ChannelModel)
     _on_exposure_params_ready = pyqtSignal(int, int)
 
-    def __init__(self, parent: 'Dashboard', monitor: Monitor):
+    def __init__(self, parent: 'Dashboard', monitor: Monitor, channel: ChannelModel=None):
         super().__init__(parent)
         self.monitor = monitor
-        self.waitting_expo_param = False
+        self.channel_model = channel
         self._on_exposure_params_ready.connect(self.on_exposure_params_ready)
+
+        self._fill_in()
 
     def init_widget(self):
         self.widget = ChannelSetup(self)
         self.ui.applyBtn.clicked.connect(self.on_apply_clicked)
         self.widget.ui.autoExpoBtn.clicked.connect(self.on_auto_clicked)
+
         return self.widget
+
+    def _fill_in(self):
+        if self.channel_model:
+            ui = self.widget.ui
+            model = self.channel_model
+            ui.chanNumEdit.setText(f"{model.channel_num:d}")
+            ui.chanNameEdit.setText(model.channel_name)
+            ui.expoEdit.setText(f"{model.expo_time:d}")
+            ui.expo2Edit.setText(f"{model.expo2_time:d}")
+            ui.pidBtn.setChecked(model.pid_enabled)
+            ui.setpointEdit.setText(f"{model.freq_setpoint}")
+            ui.pParamEdit.setText(f"{model.pid_p_prop_val}")
+            ui.iParamEdit.setText(f"{model.pid_i_prop_val}")
 
     def on_auto_clicked(self):
         ui = self.widget.ui
@@ -79,13 +95,16 @@ class AddChannelDialog(Dialog):
 
         model = ChannelModel(chan_num, chan_name)
 
+        if self.channel_model:
+            model.channel_color = self.channel_model.channel_color
+
         try:
-            model.expo_time = float(self.widget.ui.expoEdit.text())
+            model.expo_time = int(self.widget.ui.expoEdit.text())
         except ValueError:
             self.display_error("INVALID EXPO")
 
         try:
-            model.expo2_time = float(self.widget.ui.expo2Edit.text())
+            model.expo2_time = int(self.widget.ui.expo2Edit.text())
         except ValueError:
             self.display_error("INVALID EXPO2")
 

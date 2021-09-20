@@ -75,7 +75,7 @@ TableHeaderLabel {
 }
 
 ChannelNameLabel {
-    min-height: 80px;
+    min-height: 50px;
     font-size: 25px;
     border: 2px solid #e6e6e6;
     padding: 10px 20px;
@@ -94,7 +94,7 @@ ChannelPlaceholderPromptLabel {
 }
 
 BigContentLabel, FreqWavelengthLabel {
-    font-size: 40px;
+    font-size: 30px;
 }
 
 ErrorLabel {
@@ -142,6 +142,10 @@ Dialog {
     background: black;
 }
 
+Dialog QAbstractButton {
+    min-height: 15px;
+}
+
 QGroupBox {
     margin-top: 1ex;
     padding-top: 1ex;
@@ -173,4 +177,10 @@ DialogTitleLabel {
     font-size: 25px;
     background: #b3b3b3;
     padding: 5px;
+}
+
+ChannelNameWidget QAbstractButton {
+    min-height: 15px;
+    padding: 2px;
+    font-size: 12px;
 }

@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QScrollArea
 from PyQt5.QtCore import Qt, QCoreApplication
 
 from wavemeter_dashboard.view.dashboard import Dashboard
@@ -51,9 +51,12 @@ if __name__ == "__main__":
     # dac = None
 
     monitor = Monitor(wm, fs, dac)
+    scroll = QScrollArea(window)
+    scroll.setWidgetResizable(True)
     dashboard = Dashboard(window, monitor)
+    scroll.setWidget(dashboard)
 
-    window.setCentralWidget(dashboard)
+    window.setCentralWidget(scroll)
 
     window.show()
     sys.exit(app.exec_())

@@ -26,14 +26,18 @@ class TableHeaderLabel(QLabel):
 
 
 class ChannelNameLabel(FlipLabel):
-    def __init__(self, parent, channel_name, channel_num, color=None):
-        super().__init__(parent, channel_name, channel_num)
+    def __init__(self, parent, channel_name="", channel_num=0, color=None):
+        super().__init__(parent, channel_name, f"#{channel_num}")
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.color = color
 
         if self.color:
             self.change_background_color(color)
+
+    def change_name(self, channel_name, channel_num):
+        self.front = channel_name
+        self.back = f"#{channel_num}"
 
     def change_background_color(self, color):
         self.setStyleSheet(f"background: rgb({color.red()}, {color.green()}, {color.blue()})")

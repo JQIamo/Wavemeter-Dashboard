@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>473</height>
+    <width>327</width>
+    <height>611</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
+     <y>0</y>
      <width>311</width>
      <height>221</height>
     </rect>
@@ -106,7 +106,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>240</y>
+     <y>230</y>
      <width>311</width>
      <height>221</height>
     </rect>
@@ -170,6 +170,73 @@
      <widget class="QLabel" name="label_9">
       <property name="text">
        <string>I PARAM</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>460</y>
+     <width>311</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>ALERT</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>LARGE ERROR</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="lgErrEdit">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string>THz</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_12">
+      <property name="text">
+       <string>DAC RAILED</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="2">
+     <widget class="CheckButton" name="dacRailedBtn">
+      <property name="text">
+       <string>ON/OFF</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="CheckButton" name="lgErrBtn">
+      <property name="text">
+       <string>ON/OFF</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_13">
+      <property name="text">
+       <string>UNDER EXPO</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" colspan="2">
+     <widget class="CheckButton" name="underExpoBtn">
+      <property name="text">
+       <string>ON/OFF</string>
       </property>
      </widget>
     </item>
