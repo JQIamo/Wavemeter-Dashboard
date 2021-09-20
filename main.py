@@ -66,5 +66,10 @@ if __name__ == "__main__":
     with open(style) as f:
         window.setStyleSheet(f.read())
 
-    window.show()
+    if config.config.get("full_screen", False):
+        window.showFullScreen()
+    else:
+        window.show()
+        window.resize(1400, 700)
+
     sys.exit(app.exec_())

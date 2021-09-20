@@ -9,6 +9,10 @@ QMainWindow {
     background: black;
 }
 
+QScrollArea {
+    border: none;
+}
+
 QFrame[frameShape="4"]
 {
     max-height: 1px;

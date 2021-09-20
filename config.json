@@ -63,6 +63,7 @@
     ],
     "dac_com_port": "COM8",
     "fiberswitch_com_port": "COM5",
+    "full_screen": false,
     "longterm_length_limit": 200,
     "wait_time_after_switch": 0.2,
     "wait_time_before_deviating_warning": 5,
