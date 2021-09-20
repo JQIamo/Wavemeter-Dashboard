@@ -1,5 +1,5 @@
 from typing import Type, TYPE_CHECKING
-from datetime import datetime
+import time
 import random
 import numpy as np
 
@@ -52,6 +52,27 @@ class ChannelView:
         self.channel_model.on_channel_alert_action_changed.connect(self.change_alert_status)
         self.channel_model.on_refresh_alert_display_requested.connect(self.alert_label.update)
 
+        if channel_model.freq_setpoint:
+            self.freq_longterm.add_vertical_line(
+                "freq_setpoint",
+                channel_model.freq_setpoint,
+                QColor("white"), True)
+        else:
+            self.freq_longterm.remove_vertical_line("freq_setpoint")
+
+        if channel_model.freq_max_error:
+            self.freq_longterm.add_vertical_line(
+                "freq_max_error_high",
+                channel_model.freq_setpoint + channel_model.freq_max_error,
+                QColor("white"))
+            self.freq_longterm.add_vertical_line(
+                "freq_max_error_low",
+                channel_model.freq_setpoint - channel_model.freq_max_error,
+                QColor("white"))
+        else:
+            self.freq_longterm.remove_vertical_line("freq_max_error_high")
+            self.freq_longterm.remove_vertical_line("freq_max_error_low")
+
     def rebind_model(self, model):
         self.channel_model = model
         self.channel_name_widget.set_name_color(model.channel_name,
@@ -61,34 +82,16 @@ class ChannelView:
         model.on_pattern_changed.connect(self.on_pattern_changed)
         model.on_pid_changed.connect(self.on_pid_changed)
 
-        if model.freq_setpoint:
-            self.freq_longterm.add_vertical_line(
-                "freq_setpoint",
-                model.freq_setpoint,
-                QColor("white"), True)
-        else:
-            self.freq_longterm.remove_vertical_line("freq_setpoint")
-
-        if model.freq_max_error:
-            self.freq_longterm.add_vertical_line(
-                "freq_max_error_high",
-                model.freq_setpoint + model.freq_max_error,
-                QColor("white"))
-            self.freq_longterm.add_vertical_line(
-                "freq_max_error_low",
-                model.freq_setpoint - model.freq_max_error,
-                QColor("white"))
-        else:
-            self.freq_longterm.remove_vertical_line("freq_max_error_high")
-            self.freq_longterm.remove_vertical_line("freq_max_error_low")
-
     def on_freq_changed(self):
         self.freq_label.frequency = self.channel_model.frequency
-        now = datetime.now().timestamp()
+        now = time.time()
         self.freq_longterm.set_x_display_range(
             now - self.long_term_time_window, now)
-        self.freq_longterm.update_longterm_data(
-            self.channel_model.freq_longterm_data)
+        x, y = self.channel_model.freq_longterm_data.get_newest_point()
+        limit = self.channel_model.freq_longterm_data.points_limit
+        self.freq_longterm.append_newest_point(x, y, limit)
+        # self.freq_longterm.update_longterm_data(
+        #     self.channel_model.freq_longterm_data)
 
     def on_pattern_changed(self):
         max_amp = np.max(self.channel_model.pattern_data)
@@ -99,11 +102,14 @@ class ChannelView:
                                  self.channel_model.pattern_data)
 
     def on_pid_changed(self):
-        now = datetime.now().timestamp()
+        now = time.time()
         self.dac_longterm.set_x_display_range(
             now - self.long_term_time_window, now)
-        self.dac_longterm.update_longterm_data(
-            self.channel_model.dac_longterm_data)
+        x, y = self.channel_model.dac_longterm_data.get_newest_point()
+        limit = self.channel_model.dac_longterm_data.points_limit
+        self.freq_longterm.append_newest_point(x, y, limit)
+        # self.dac_longterm.update_longterm_data(
+        #     self.channel_model.dac_longterm_data)
 
     def show_channel_setup(self):
         self.dashboard.on_set_channel_clicked(self.channel_model.channel_num)

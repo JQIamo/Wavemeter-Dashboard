@@ -50,3 +50,10 @@ class LongtermData:
             append_method(self.time[idx], self.values[idx])
             idx += 1
 
+    def get_newest_point(self):
+        idx = self.index
+        if self.index == len(self.time):
+            idx = 0
+
+        return self.time[idx], self.values[idx]
+

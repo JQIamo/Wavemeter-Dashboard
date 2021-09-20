@@ -42,6 +42,24 @@ class ThumbnailLineChart(QChartView):
 
         self.setChart(self.chart)
 
+    def append_newest_point(self, x, y, points_limit=0):
+        assert x > self.x_max
+        self.chart.removeSeries(self.series)
+
+        if self.x_min == 0:
+            self.x_min = x
+
+        self.x_max = x
+
+        if points_limit and self.series.count() >= points_limit:
+            # remove first point
+            self.series.remove(0)
+
+        self.series.append(x, y)
+
+        self.chart.addSeries(self.series)
+        self.update_vertical_lines()
+
     def update_data(self, xs, ys):
         self.clear_series()
 
@@ -52,6 +70,7 @@ class ThumbnailLineChart(QChartView):
             self.series.append(x, y)
 
         self.chart.addSeries(self.series)
+        self.update_vertical_lines()
 
     def update_longterm_data(self, longterm: LongtermData):
         self.clear_series()
