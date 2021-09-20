@@ -1,11 +1,9 @@
 import random
-import numpy as np
-from datetime import datetime
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtGui import QColor
 
-from wavemeter_dashboard.config import config
+from wavemeter_dashboard.model.longterm_data import LongtermData
 
 colors = [QColor(204, 0, 0),
           QColor(204, 102, 0),
@@ -52,7 +50,7 @@ class ChannelModel(QObject):
         self.frequency = None
         self.pattern_data = None
         self.wide_pattern_data = None
-        self.freq_longterm_data = {}
+        self.freq_longterm_data = LongtermData()
 
         self.expo_time = None
         self.expo2_time = None
@@ -65,29 +63,13 @@ class ChannelModel(QObject):
         self.pid_i = 0
         self.error = 0
         self.dac_output = 0
-        self.dac_longterm_data = {}
+        self.dac_longterm_data = LongtermData()
         self.dac_railed = False
 
-    @staticmethod
-    def append_longterm_data(var, data):
-        if not var:
-            var['time'] = []
-            var['values'] = []
-            var['index'] = 0
-
-        if config.has('longterm_length_limit') and \
-                len(var['values']) == config.get('longterm_length_limit'):
-            if var['index'] == len(var['values']):
-                var['index'] = 0
-
-            index = var['index']
-            var['time'][index] = datetime.now().timestamp()
-            var['values'][index] = data
-        else:
-            var['time'].append(datetime.now().timestamp())
-            var['values'].append(data)
-
-        var['index'] += 1
+        # error tracker fields
+        self.total_errors = []
+        self.active_errors = []
+        self.current_error_action = None
 
     def dump_settings_dict(self):
         return {

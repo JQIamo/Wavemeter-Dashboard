@@ -85,7 +85,7 @@ class Monitor(QObject):
                     # self.on_channel_error.emit(channel_num, f"Channel {channel_num} error: {e}")
                     return
 
-        ch.append_longterm_data(ch.freq_longterm_data, ch.frequency)
+        ch.freq_longterm_data.append(ch.frequency)
 
         if ch.freq_setpoint:
             ch.error = ch.frequency - ch.freq_setpoint
@@ -112,7 +112,7 @@ class Monitor(QObject):
                 ch.dac_railed = True
 
             ch.dac_output = output
-            ch.append_longterm_data(ch.dac_longterm_data, output)
+            ch.dac_longterm_data.append(output)
 
             ch.on_pid_changed.emit()
 

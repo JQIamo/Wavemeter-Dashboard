@@ -2,6 +2,8 @@ from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
 from PyQt5.QtGui import QColor, QPen, QPainter
 from PyQt5.QtCore import QRectF, Qt
 
+from wavemeter_dashboard.model.longterm_data import LongtermData
+
 
 class ThumbnailLineChart(QChartView):
     def __init__(self, parent):
@@ -44,17 +46,18 @@ class ThumbnailLineChart(QChartView):
         self.clear_series()
 
         self.x_min = min(xs)
-        self.y_min = max(xs)
+        self.x_max = max(xs)
 
         for x, y in zip(xs, ys):
             self.series.append(x, y)
 
         self.chart.addSeries(self.series)
 
-    def update_longterm_data(self, longterm_dict):
+    def update_longterm_data(self, longterm: LongtermData):
         self.clear_series()
 
-        self._transfer_longterm_data(self.series.append, longterm_dict)
+        longterm.transfer_to(self.series.append)
+        self.x_min, self.x_max = longterm.get_time_range()
 
         self.chart.addSeries(self.series)
 
@@ -102,20 +105,3 @@ class ThumbnailLineChart(QChartView):
         super().resizeEvent(event)
         self.chart.setPlotArea(QRectF(0, 0,
                                       self.width(), self.height()))
-
-    def _transfer_longterm_data(self, append_method, var):
-        assert 'index' in var and 'values' in var and 'time' in var
-
-        count = len(var['values'])
-        idx = var['index']
-
-        self.x_min = var['values'][idx]
-
-        for i in range(count):
-            if idx == count:
-                idx = 0
-
-            append_method(var['time'][idx], var['values'][idx])
-            idx += 1
-
-        self.x_max = var['values'][idx - 1]
