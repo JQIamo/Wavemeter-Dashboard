@@ -180,12 +180,12 @@ class Monitor(QObject):
         ch.freq_longterm_data.append(ch.frequency)
         ch.on_freq_changed.emit()
 
-        if ch.pattern_enabled:
+        if ch.isSignalConnected(ch.on_pattern_changed_meta):
             ch.pattern_data = self.wavemeter.get_next_pattern()
             ch.on_pattern_changed.emit()
 
-        if ch.wide_pattern_enabled:
-            ch.wide_pattern_date = self.wavemeter.get_next_pattern(True)
+        if ch.isSignalConnected(ch.on_wide_pattern_changed_meta):
+            ch.wide_pattern_data = self.wavemeter.get_next_pattern(True)
             ch.on_wide_pattern_changed.emit()
 
         if ch.pid_enabled and ch.freq_setpoint:

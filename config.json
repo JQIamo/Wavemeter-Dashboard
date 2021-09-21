@@ -14,11 +14,9 @@
             "freq_max_error": 5000000.0,
             "freq_setpoint": 441332590000000.0,
             "monitor_enabled": true,
-            "pattern_enabled": true,
             "pid_enabled": true,
             "pid_i_prop_val": 0.0,
-            "pid_p_prop_val": 1000000.0,
-            "wide_pattern_enabled": false
+            "pid_p_prop_val": 1000000.0
         },
         {
             "channel_color": [
@@ -34,11 +32,9 @@
             "freq_max_error": 5000000.0,
             "freq_setpoint": 423913590000000.0,
             "monitor_enabled": true,
-            "pattern_enabled": true,
             "pid_enabled": true,
             "pid_i_prop_val": 0.0,
-            "pid_p_prop_val": 1000000.0,
-            "wide_pattern_enabled": false
+            "pid_p_prop_val": 1000000.0
         },
         {
             "channel_color": [
@@ -54,11 +50,9 @@
             "freq_max_error": null,
             "freq_setpoint": null,
             "monitor_enabled": true,
-            "pattern_enabled": true,
             "pid_enabled": false,
             "pid_i_prop_val": 0,
-            "pid_p_prop_val": -1,
-            "wide_pattern_enabled": false
+            "pid_p_prop_val": -1
         }
     ],
     "dac_com_port": "COM8",

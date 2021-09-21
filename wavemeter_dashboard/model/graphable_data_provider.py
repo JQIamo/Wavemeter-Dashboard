@@ -6,9 +6,10 @@ from wavemeter_dashboard.model.channel_model import ChannelModel
 
 class GraphableDataKind(Enum):
     PATTERN = 0
-    FREQ_LONGTERM = 1
-    DAC_LONGTERM = 2
-    ERR_LONGTERM = 3
+    WIDE_PATTERN = 1
+    FREQ_LONGTERM = 2
+    DAC_LONGTERM = 3
+    ERR_LONGTERM = 4
 
 
 class DataType(Enum):
@@ -73,6 +74,34 @@ class PatternDataProvider(GraphableDataProvider):
 
     def transfer_data(self, append_method):
         for x, y in enumerate(self.channel.pattern_data):
+            append_method(x, y)
+
+    def append_newest_data(self, append_method):
+        raise NotImplementedError
+
+
+class WidePatternDataProvider(GraphableDataProvider):
+    name = "WIDE INTERFEROMETER PATTERN"
+    kind = GraphableDataKind.PATTERN
+
+    def __init__(self, channel: ChannelModel):
+        super().__init__(channel)
+        self.x_axis_label = "CCD Channel"
+        self.x_axis_unit = ""
+        self.x_axis_type = DataType.INT
+        self.y_axis_label = "Count"
+        self.y_axis_unit = "arb."
+        self.y_axis_type = DataType.INT
+        self.append_only = False
+
+        self.new_data_signal: pyqtSignal = channel.on_wide_pattern_changed
+
+    def get_data(self):
+        # not efficient, not recommended
+        return zip(*enumerate(self.channel.wide_pattern_data))
+
+    def transfer_data(self, append_method):
+        for x, y in enumerate(self.channel.wide_pattern_data):
             append_method(x, y)
 
     def append_newest_data(self, append_method):
@@ -174,6 +203,7 @@ class DACLongtermDataProvider(GraphableDataProvider):
 
 GRAPHABLE_DATA = {
     GraphableDataKind.PATTERN: PatternDataProvider,
+    GraphableDataKind.WIDE_PATTERN: WidePatternDataProvider,
     GraphableDataKind.FREQ_LONGTERM: FreqLongtermDataProvider,
     GraphableDataKind.ERR_LONGTERM: ErrLongtermDataProvider,
     GraphableDataKind.DAC_LONGTERM: DACLongtermDataProvider

@@ -85,7 +85,7 @@ class ChannelView(QObject):
                                                 model.channel_num,
                                                 model.channel_color)
         model.on_freq_changed.connect(self.on_freq_changed)
-        model.on_pattern_changed.connect(self.on_pattern_changed)
+        model.on_wide_pattern_changed.connect(self.on_pattern_changed)
         model.on_pid_changed.connect(self.on_pid_changed)
 
     def on_freq_changed(self):
@@ -100,15 +100,15 @@ class ChannelView(QObject):
         #     self.channel_model.freq_longterm_data)
 
     def on_pattern_changed(self):
-        max_amp = np.max(self.channel_model.pattern_data)
+        max_amp = np.max(self.channel_model.wide_pattern_data)
         if max_amp > self.dashboard.pattern_max_amp:
             self.dashboard.pattern_max_amp = max_amp
         if self.pattern.isVisible():
             # don't do futile work
             # copy this array really takes sometime!
             # TODO: consider downsampling here
-            self.pattern.update_data(range(len(self.channel_model.pattern_data)),
-                                     self.channel_model.pattern_data)
+            self.pattern.update_data(range(len(self.channel_model.wide_pattern_data)),
+                                     self.channel_model.wide_pattern_data)
 
     def on_pid_changed(self):
         now = time.time()

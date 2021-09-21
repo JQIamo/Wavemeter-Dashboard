@@ -1,6 +1,7 @@
 import random
+import numpy as np
 
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QMetaMethod 
 from PyQt5.QtGui import QColor
 
 from wavemeter_dashboard.model.channel_alert import ChannelAlertCode, ChannelAlertAction
@@ -55,8 +56,6 @@ class ChannelModel(QObject):
         # maintained by ChannelSetup
         self.channel_num = channel_num
         self.dac_channel_num = dac_channel_num
-        self.pattern_enabled = True
-        self.wide_pattern_enabled = False
         self.expo_time = None
         self.expo2_time = None
         self.pid_enabled = False
@@ -73,8 +72,8 @@ class ChannelModel(QObject):
 
         # maintained by Monitor
         self.frequency = None
-        self.pattern_data = None
-        self.wide_pattern_data = None
+        self.pattern_data = np.array([])
+        self.wide_pattern_data = np.array([])
         self.freq_longterm_data = LongtermData()
 
         self.freq_max_error = None
@@ -92,6 +91,9 @@ class ChannelModel(QObject):
         self.active_alerts = []
         self.superseded_alerts = {}
         self.channel_alert_action = None
+        
+        self.on_pattern_changed_meta = self.get_meta_method_from_signal("on_pattern_changed")
+        self.on_wide_pattern_changed_meta = self.get_meta_method_from_signal("on_wide_pattern_changed")
 
     def dump_settings_dict(self):
         return {
@@ -102,8 +104,6 @@ class ChannelModel(QObject):
             'channel_color': [self.channel_color.red(),
                               self.channel_color.green(),
                               self.channel_color.blue()],
-            'pattern_enabled': self.pattern_enabled,
-            'wide_pattern_enabled': self.wide_pattern_enabled,
             'expo_time': self.expo_time,
             'expo2_time': self.expo2_time,
             'pid_enabled': self.pid_enabled,
@@ -120,8 +120,6 @@ class ChannelModel(QObject):
         channel = ChannelModel(_dict['channel_num'], _dict['channel_name'],
                                color, _dict['dac_channel_num'])
         channel.monitor_enabled = _dict['monitor_enabled']
-        channel.pattern_enabled = _dict['pattern_enabled']
-        channel.wide_pattern_enabled = _dict['wide_pattern_enabled']
         channel.expo_time = _dict['expo_time']
         channel.expo2_time = _dict['expo2_time']
         channel.pid_enabled = _dict['pid_enabled']
@@ -131,4 +129,16 @@ class ChannelModel(QObject):
         channel.pid_p_prop_val = _dict['pid_p_prop_val']
 
         return channel
+    
+    def get_meta_method_from_signal(self, name):
+        metaobj = self.metaObject()
+
+        for i in range(metaobj.methodCount()):
+            meta_method = metaobj.method(i)
+            if meta_method.methodType() == QMetaMethod.Signal:
+                _name = meta_method.name().data().decode('ascii')
+                if _name == name:
+                    return meta_method
+        
+        raise Exception("Unknown signal!")
 
