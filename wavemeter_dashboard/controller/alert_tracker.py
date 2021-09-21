@@ -1,7 +1,7 @@
 from typing import Dict
 from itertools import chain
 from functools import partial
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject, QMutex
 
 from wavemeter_dashboard.model.channel_alert import (ChannelAlert,
                                                      ChannelAlertCode,
@@ -14,15 +14,19 @@ class AlertTracker(QObject):
         super().__init__()
 
         self.channels: Dict[ChannelModel] = {}
+        self.channel_locks: Dict[int, QMutex] = {}
 
     def add_channel(self, channel: ChannelModel):
         if channel.channel_num not in self.channels:
             self.channels[channel.channel_num] = channel
+            self.channel_locks[channel.channel_num] = QMutex()
             channel.on_new_alert.connect(partial(self.add_alert, channel.channel_num))
             channel.on_alert_dismissed.connect(partial(self.dismiss_alert, channel.channel_num))
             channel.on_alert_cleared.connect(partial(self.clear_alert, channel.channel_num))
 
     def add_alert(self, channel_num, alert_code: ChannelAlertCode):
+        lock = self.channel_locks[channel_num]
+        lock.lock()
         # print(f"adding {alert_code} to ch{channel_num}")
         need_update = False
         channel = self.channels[channel_num]
@@ -64,6 +68,7 @@ class AlertTracker(QObject):
                 self._insert_into_active_alerts(channel, alert_code)
                 need_update = True
             else:
+                lock.unlock()
                 return
 
         elif alert_code not in channel.active_alerts:
@@ -76,6 +81,7 @@ class AlertTracker(QObject):
             else:
                 # then it must have been superseded by something, in this case,
                 # simply do nothing
+                lock.unlock()
                 return
         else:
             # in total_alerts and in active_alerts
@@ -86,7 +92,11 @@ class AlertTracker(QObject):
             channel.on_refresh_alert_display_requested.emit()
             self.refresh_channel_action(channel)
 
+        lock.unlock()
+
     def clear_alert(self, channel_num, code: ChannelAlertCode):
+        lock = self.channel_locks[channel_num]
+        lock.lock()
         # print(f"cleaning {code} from ch{channel_num}")
         need_refresh = False
         channel = self.channels[channel_num]
@@ -113,6 +123,8 @@ class AlertTracker(QObject):
 
             for code in superseded:
                 # ensure not superseded by other alerts
+                if code not in channel.total_alerts:
+                    continue
                 if code not in chain(*channel.superseded_alerts.values()):
                     need_refresh = True
                     self._insert_into_active_alerts(channel, code)
@@ -121,9 +133,15 @@ class AlertTracker(QObject):
             channel.on_refresh_alert_display_requested.emit()
             self.refresh_channel_action(channel)
 
+        # print(f"- active: {channel.active_alerts}")
+        lock.unlock()
+
     def dismiss_alert(self, channel_num, code: ChannelAlertCode):
+        lock = self.channel_locks[channel_num]
+        lock.lock()
         channel = self.channels[channel_num]
         if code not in channel.active_alerts:
+            lock.unlock()
             return
 
         channel.active_alerts.remove(code)
@@ -131,6 +149,7 @@ class AlertTracker(QObject):
 
         channel.on_refresh_alert_display_requested.emit()
         self.refresh_channel_action(channel)
+        lock.unlock()
 
     @staticmethod
     def refresh_channel_action(channel):

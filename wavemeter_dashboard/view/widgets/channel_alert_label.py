@@ -30,6 +30,9 @@ class ChannelAlertLabel(QLabel):
         self._state = val
 
     def update(self):
+        # print(f"ch{self.channel.channel_num} alert label update requested")
+        # print(f" - total {self.channel.total_alerts}")
+        # print(f" - active {self.channel.active_alerts}")
         self.display_index = 0
 
         if self.channel.active_alerts:
@@ -77,7 +80,6 @@ class ChannelAlertLabel(QLabel):
             self.refresh_bg()
 
     def next_alert(self):
-        print(self.channel.total_alerts, self.channel.active_alerts)
         if len(self.channel.active_alerts) == 0:
             return
 

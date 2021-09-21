@@ -1,5 +1,6 @@
 from typing import Dict
 import time
+import numpy as np
 from threading import Thread, Lock, Condition
 from functools import partial
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -88,13 +89,6 @@ class Monitor(QObject):
         self.stop_monitoring_flag = False
         self.last_monitored_channel = None
 
-        for channel in self.channels.values():
-            if channel.monitor_enabled:
-                channel.on_alert_cleared.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
-                channel.on_alert_cleared.emit(ChannelAlertCode.PID_ENGAGED)
-                channel.on_alert_cleared.emit(ChannelAlertCode.PID_LOCKED)
-                channel.on_new_alert.emit(ChannelAlertCode.IDLE)
-
         with self.monitor_stop_cv:
             self.monitor_stop_cv.notify_all()
 
@@ -122,7 +116,6 @@ class Monitor(QObject):
             except WavemeterWS7Exception as e:
                 pass
             time.sleep(0.05)
-
         if not success:
             # last chance before throwing out errors
             try:
@@ -227,6 +220,14 @@ class Monitor(QObject):
         self.stop_monitoring_flag = True
         with self.monitor_stop_cv:
             self.monitor_stop_cv.wait()
+
+            for channel in self.channels.values():
+                if channel.monitor_enabled:
+                    channel.on_alert_cleared.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
+                    channel.on_alert_cleared.emit(ChannelAlertCode.PID_ENGAGED)
+                    channel.on_alert_cleared.emit(ChannelAlertCode.PID_LOCKED)
+                    channel.on_new_alert.emit(ChannelAlertCode.IDLE)
+
             self.on_monitor_stopped.emit()
 
     def is_monitoring(self):
