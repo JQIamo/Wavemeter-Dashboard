@@ -36,6 +36,9 @@ class DAC:
 
         self.write(f"S {ch} {val}")
 
+    def reset_dac(self, ch):
+        self.write(f"S {ch} 32000")
+
     def set_dac_inc(self, ch, inc):
         self.write(f"D {ch} {inc}")
         if self.is_railed(ch):

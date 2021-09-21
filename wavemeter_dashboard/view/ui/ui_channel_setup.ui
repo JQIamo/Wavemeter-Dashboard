@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>327</width>
-    <height>633</height>
+    <height>658</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -114,17 +114,17 @@
      <x>10</x>
      <y>230</y>
      <width>311</width>
-     <height>221</height>
+     <height>251</height>
     </rect>
    </property>
    <property name="title">
     <string>PID</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_7">
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_9">
       <property name="text">
-       <string>SETPOINT</string>
+       <string>I PARAM</string>
       </property>
      </widget>
     </item>
@@ -135,13 +135,37 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="pParamEdit"/>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="dacChanEdit"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>PID CTRL</string>
+      </property>
+     </widget>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label_10">
       <property name="text">
        <string>DAC CHANNEL</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_7">
+      <property name="text">
+       <string>SETPOINT</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="pParamEdit"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>P PARAM</string>
       </property>
      </widget>
     </item>
@@ -152,30 +176,20 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>PID CTRL</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="dacChanEdit"/>
-    </item>
     <item row="4" column="1">
      <widget class="QLineEdit" name="iParamEdit"/>
     </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_8">
+    <item row="5" column="0">
+     <widget class="QLabel" name="dacOutputEdit">
       <property name="text">
-       <string>P PARAM</string>
+       <string>DAC OUTPUT</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_9">
+    <item row="5" column="1">
+     <widget class="QPushButton" name="dacResetBtn">
       <property name="text">
-       <string>I PARAM</string>
+       <string>RESET</string>
       </property>
      </widget>
     </item>
@@ -185,7 +199,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>479</y>
      <width>311</width>
      <height>141</height>
     </rect>
@@ -258,7 +272,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>601</y>
+     <y>620</y>
      <width>311</width>
      <height>31</height>
     </rect>

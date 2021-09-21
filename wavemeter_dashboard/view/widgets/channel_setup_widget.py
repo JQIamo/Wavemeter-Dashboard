@@ -23,6 +23,7 @@ class ChannelSetupWidget(QWidget):
         self.monitor = monitor
         self.channel_model = channel
         self.ui.autoExpoBtn.clicked.connect(self.on_auto_clicked)
+        self.ui.dacResetBtn.clicked.connect(self.on_reset_dac_clicked)
         self._on_exposure_params_ready.connect(self.on_exposure_params_ready)
 
         if self.channel_model:
@@ -73,6 +74,10 @@ class ChannelSetupWidget(QWidget):
             self._on_exposure_params_ready.emit(expo, expo2)
 
         threading.Thread(target=run).start()
+    
+    def on_reset_dac_clicked(self):
+        if self.channel_model:
+            self.channel_model.on_channel_dac_reset.emit()
 
     def on_exposure_params_ready(self, expo, expo2):
         ui = self.ui

@@ -31,6 +31,7 @@ class ChannelModel(QObject):
 
     # signal for ChannelView to notify Monitor
     on_channel_monitor_enabled = pyqtSignal(bool)  # args: is_enabled
+    on_channel_dac_reset = pyqtSignal()
 
     # signal from AlertTracker to ChannelView
     on_refresh_alert_display_requested = pyqtSignal()

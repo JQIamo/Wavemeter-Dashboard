@@ -239,6 +239,9 @@ class Monitor(QObject):
             channel.on_channel_monitor_enabled.connect(
                 partial(self.on_channel_monitor_enabled, channel.channel_num)
             )
+            channel.on_channel_dac_reset.connect(
+                partial(self.reset_channel_dac, channel.channel_num)
+            )
 
         return channel
 
@@ -252,6 +255,10 @@ class Monitor(QObject):
                     channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
             else:
                 channel.on_new_alert.emit(ChannelAlertCode.IDLE)
+
+    def reset_channel_dac(self, channel_num):
+        ch = self.channels[channel_num]
+        self.dac.reset_dac(ch.dac_channel_num)
 
     def remove_channel(self, channel_num):
         # should be called by the frontend
