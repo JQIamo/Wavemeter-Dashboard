@@ -1,4 +1,25 @@
-# TODO
+# Sr Lab Wavemeter Monitor
+
+It is designed to work with the wave meter, fiber switch and DAC Arduino box in
+Sr Lab.
+
+Some cool features:
+- A nice dashboard view to let you monitor the frequency and some crucial data
+of several channels.
+- PID (well, actually no D, just PI) control to set the DAC to fight against
+frequency error.
+- Signal Channel Display to let you have a clear view of the wave meter pattern,
+long-term frequency changes, etc.
+- Alert system, screaming at you if things went wrong.
+
+## Screenshot
+
+![Dashboard View](wavemeter_dashboard/docs/dashboard_view_screenshot.png)
+
+
+## TODO
+
+### Done
 
 - [x] dac: control instruction
 - [x] dac: out-of-bound exception
@@ -24,16 +45,20 @@
 - [x] monitor: pid out-of-lock text warning
 - [x] monitor: pid railed text warning
 - [x] dashboard: remove channel from monitoring
-- [ ] dashboard: delete channel
-- [ ] dashboard: add/delete columns dialog
-- [ ] dashboard: column width
 - [x] dashboard: stacked widget
 - [x] dashboard: scroll
-- [ ] big screen: mulit-plot display
-- [ ] big screen: freq display
-- [ ] monitor: single channel monitoring
-- [ ] big screen: channel settings
+- [x] big screen: mulit-plot display
+- [x] big screen: freq display
+- [x] monitor: single channel monitoring
+- [x] big screen: channel settings
+
+### Planned
+- [ ] dashboard: delete channel
+- [ ] big screen: display the clicked graph by default
+- [ ] big screen: start/stop monitoring
 - [ ] big screen: auto-exposure
-- [ ] dashboard: save layout
+- [ ] misc: wrap the whole program
+- [ ] main window: icon
+
+### Good to have
 - [ ] thumbnail: scroll zoom in/out
-- [ ] dashboard: dynamic thumbnail plot min/max adjustment
