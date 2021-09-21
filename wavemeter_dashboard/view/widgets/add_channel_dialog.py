@@ -15,6 +15,7 @@ class AddChannelDialog(Dialog):
     title = "ADD CHANNEL"
 
     on_apply = pyqtSignal(ChannelModel)
+    on_remove_channel = pyqtSignal(int)  # args: channel_num
 
     def __init__(self, parent: 'Dashboard', monitor: Monitor, channel: ChannelModel = None):
         self.monitor = monitor
@@ -26,6 +27,12 @@ class AddChannelDialog(Dialog):
         self.ui.applyBtn.clicked.connect(self.on_apply_clicked)
 
         return self.widget
+
+    def show_remove_channel_button(self):
+        assert self.channel_model
+        self.widget.ui.removeChannelBtn.setVisible(True)
+        self.widget.ui.removeChannelBtn.clicked.connect(
+            lambda: self.on_remove_channel.emit(self.channel_model.channel_num))
 
     def on_apply_clicked(self):
         try:

@@ -31,11 +31,16 @@ class MainWindow(QMainWindow):
         self.dashboard = Dashboard(self, self.monitor, self.alert_tracker, self.channels)
         self.dashboard.on_switch_to_single_channel_display_clicked.connect(
             self.switch_to_single_channel_display)
+        self.dashboard.on_channel_list_update.connect(self.update_channels_from_dashboard)
 
         self.scroll.setWidget(self.dashboard)
 
         if self.single_channel_display:
             self.single_channel_display = None
+
+    def update_channels_from_dashboard(self):
+        if self.dashboard:
+            self.channels = [channel_view.channel_model for channel_view in self.dashboard.channels]
 
     def switch_to_single_channel_display(self, channel):
         self.single_channel_display = SingleChannelDisplay(

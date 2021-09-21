@@ -49,6 +49,7 @@ class Dashboard(QWidget):
     horizontal_spacing = 30
 
     on_switch_to_single_channel_display_clicked = pyqtSignal(ChannelModel)
+    on_channel_list_update = pyqtSignal()
 
     def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker,
                  channels: List[ChannelModel]=None):
@@ -178,6 +179,25 @@ class Dashboard(QWidget):
             view.alert_label.update()
             self.resize(self.width(), self.height())
 
+    def remove_channel(self, channel_num):
+        if self.monitor.is_monitoring():
+            self.monitor.stop_monitoring()
+
+        # find channel in self.channels
+        filtered = list(filter(
+            lambda c: c[1].channel_model.channel_num == channel_num,
+            enumerate(self.channels)
+        ))
+        if not filtered:
+            return
+        idx = filtered[0][0]
+
+        del self.channels[idx]
+        del self.color_strips[channel_num]
+
+        self.monitor.remove_channel(channel_num)
+        self.alert_tracker.remove_channel(channel_num)
+
     def on_add_channel_clicked(self):
         dialog = AddChannelDialog(self, self.monitor)
         self.ui.addChannelBtn.setEnabled(False)
@@ -194,11 +214,13 @@ class Dashboard(QWidget):
             return
 
         dialog = AddChannelDialog(self, self.monitor, old_ch.channel_model)
+        dialog.show_remove_channel_button()
         self.ui.addChannelBtn.setEnabled(False)
         self.ui.monBtn.setEnabled(False)
 
         dialog.on_apply.connect(self.on_add_channel_dialog_apply)
         dialog.on_close.connect(self.on_add_channel_dialog_close)
+        dialog.on_remove_channel.connect(self.remove_channel)
         dialog.show()
 
     def display_message_box(self, title, message):

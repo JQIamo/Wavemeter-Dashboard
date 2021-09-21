@@ -53,9 +53,9 @@ long-term frequency changes, etc.
 - [x] big screen: channel settings
 - [x] big screen: start/stop monitoring
 - [x] big screen: auto-exposure
+- [x] dashboard: delete channel
 
 ### Planned
-- [ ] dashboard: delete channel
 - [ ] big screen: display the clicked graph by default
 - [ ] misc: wrap the whole program
 - [ ] main window: icon
