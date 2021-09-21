@@ -64,9 +64,9 @@ class ChannelModel(QObject):
         self.pid_p_prop_val = None
         self.pid_i_prop_val = None
 
-        self.error_alert_enabled = False
-        self.dac_railed_alert_enabled = False
-        self.wmt_alert_enabled = False
+        self.alert_error_out_of_bound_enabled = True
+        self.alert_dac_railed_enabled = True
+        self.alert_wmt_enabled = True
 
         # maintained by ChannelView
         self.monitor_enabled = False
@@ -87,6 +87,7 @@ class ChannelModel(QObject):
         self.stable_since = 0
 
         # maintained by AlertTracker
+        self.always_dismiss_alerts = []
         self.total_alerts = []
         self.dismissed_alerts = []
         self.active_alerts = []
@@ -111,7 +112,10 @@ class ChannelModel(QObject):
             'freq_setpoint': self.freq_setpoint,
             'freq_max_error': self.freq_max_error,
             'pid_i_prop_val': self.pid_i_prop_val,
-            'pid_p_prop_val': self.pid_p_prop_val
+            'pid_p_prop_val': self.pid_p_prop_val,
+            'alert_error_out_of_bound_enabled': self.alert_error_out_of_bound_enabled,
+            'alert_dac_railed_enabled': self.alert_dac_railed_enabled,
+            'alert_wmt_enabled': self.alert_wmt_enabled
         }
 
     @staticmethod
@@ -128,9 +132,28 @@ class ChannelModel(QObject):
         channel.freq_max_error = _dict['freq_max_error']
         channel.pid_i_prop_val = _dict['pid_i_prop_val']
         channel.pid_p_prop_val = _dict['pid_p_prop_val']
+        channel.alert_error_out_of_bound_enabled = _dict['alert_error_out_of_bound_enabled']
+        channel.alert_dac_railed_enabled = _dict['alert_dac_railed_enabled']
+        channel.alert_wmt_enabled = _dict['alert_wmt_enabled']
+        channel.generate_always_dismiss()
 
         return channel
-    
+
+    def generate_always_dismiss(self):
+        self.always_dismiss_alerts = []
+        for (option, err) in [
+            (self.alert_error_out_of_bound_enabled, ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL),
+            (self.alert_error_out_of_bound_enabled, ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING),
+            (self.alert_dac_railed_enabled, ChannelAlertCode.PID_DAC_RAILED),
+            (self.alert_wmt_enabled, ChannelAlertCode.WAVEMETER_NO_SIGNAL),
+            (self.alert_wmt_enabled, ChannelAlertCode.WAVEMETER_BAD_SIGNAL),
+            (self.alert_wmt_enabled, ChannelAlertCode.WAVEMETER_UNDER_EXPOSED),
+            (self.alert_wmt_enabled, ChannelAlertCode.WAVEMETER_OVER_EXPOSED),
+            (self.alert_wmt_enabled, ChannelAlertCode.WAVEMETER_UNKNOWN_ERROR),
+        ]:
+            if not option:
+                self.always_dismiss_alerts.append(err)
+
     def get_meta_method_from_signal(self, name):
         metaobj = self.metaObject()
 

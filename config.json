@@ -1,6 +1,9 @@
 {
     "channels": [
         {
+            "alert_dac_railed_enabled": true,
+            "alert_error_out_of_bound_enabled": true,
+            "alert_wmt_enabled": true,
             "channel_color": [
                 204,
                 0,
@@ -19,6 +22,9 @@
             "pid_p_prop_val": 1000000.0
         },
         {
+            "alert_dac_railed_enabled": true,
+            "alert_error_out_of_bound_enabled": true,
+            "alert_wmt_enabled": true,
             "channel_color": [
                 102,
                 204,
@@ -37,6 +43,9 @@
             "pid_p_prop_val": 1000000.0
         },
         {
+            "alert_dac_railed_enabled": true,
+            "alert_error_out_of_bound_enabled": true,
+            "alert_wmt_enabled": true,
             "channel_color": [
                 0,
                 204,

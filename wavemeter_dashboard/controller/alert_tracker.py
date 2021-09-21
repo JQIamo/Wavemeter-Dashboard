@@ -66,6 +66,10 @@ class AlertTracker(QObject):
 
             # isn't superseded:
             if not is_superseded:
+                if alert_code in channel.always_dismiss_alerts:
+                    channel.dismissed_alerts.append(alert_code)
+                    lock.unlock()
+                    return
                 self._insert_into_active_alerts(channel, alert_code)
                 need_update = True
             else:

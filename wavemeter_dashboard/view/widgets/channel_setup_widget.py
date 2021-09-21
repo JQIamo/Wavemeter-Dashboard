@@ -43,7 +43,11 @@ class ChannelSetupWidget(QWidget):
         ui.chanNameEdit.setText(model.channel_name)
         ui.expoEdit.setText(f"{model.expo_time:d}")
         ui.expo2Edit.setText(f"{model.expo2_time:d}")
+
         ui.pidBtn.setChecked(model.pid_enabled)
+        ui.errAlertBtn.setChecked(model.alert_error_out_of_bound_enabled)
+        ui.dacRailedBtn.setChecked(model.alert_dac_railed_enabled)
+        ui.wmtErrBtn.setChecked(model.alert_wmt_enabled)
 
         if model.freq_setpoint:
             ui.setpointEdit.setText(convert_freq_for_forms(model.freq_setpoint))
@@ -148,12 +152,13 @@ class ChannelSetupWidget(QWidget):
 
         # alert section
 
-        model.error_alert_enabled = self.ui.errAlertBtn.isChecked()
-        model.dac_railed_alert_enabled = self.ui.dacRailedBtn.isChecked()
-        model.wmt_alert_enabled = self.ui.wmtErrBtn.isChecked()
+        model.alert_error_out_of_bound_enabled = self.ui.errAlertBtn.isChecked()
+        model.alert_dac_railed_enabled = self.ui.dacRailedBtn.isChecked()
+        model.alert_wmt_enabled = self.ui.wmtErrBtn.isChecked()
+        model.generate_always_dismiss()
 
         try:
-            if model.error_alert_enabled or self.ui.errBoundEdit.text():
+            if model.alert_error_out_of_bound_enabled or self.ui.errBoundEdit.text():
                 model.freq_max_error = convert_freq_to_number(
                     self.ui.errBoundEdit.text())
         except ValueError:
