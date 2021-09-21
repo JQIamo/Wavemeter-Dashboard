@@ -5,11 +5,12 @@ from wavemeter_dashboard.model.channel_model import ChannelModel
 
 
 class GraphableDataKind(Enum):
-    PATTERN = 0
-    WIDE_PATTERN = 1
-    FREQ_LONGTERM = 2
-    DAC_LONGTERM = 3
-    ERR_LONGTERM = 4
+    NONE = 0
+    PATTERN = 1
+    WIDE_PATTERN = 2
+    FREQ_LONGTERM = 3
+    DAC_LONGTERM = 4
+    ERR_LONGTERM = 5
 
 
 class DataType(Enum):

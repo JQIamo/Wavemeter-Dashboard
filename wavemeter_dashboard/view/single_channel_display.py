@@ -91,6 +91,9 @@ class SingleChannelDisplay(QWidget):
         self.ui.bigFreqLabel.frequency = self.channel.frequency
 
     def add_graph(self, graph_type: GraphableDataKind):
+        if graph_type == GraphableDataKind.NONE:
+            return
+
         assert graph_type not in self.data_providers
         data_provider = GRAPHABLE_DATA[graph_type](self.channel)
         graph = Graph(self, data_provider)

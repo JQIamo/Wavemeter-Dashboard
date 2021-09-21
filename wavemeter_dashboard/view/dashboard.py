@@ -13,6 +13,7 @@ from wavemeter_dashboard.config import config
 from ..controller.alert_tracker import AlertTracker
 from ..controller.monitor import Monitor
 from ..model.channel_alert import ChannelAlertCode
+from ..model.graphable_data_provider import GraphableDataKind
 
 
 class ColumnType(Enum):
@@ -48,7 +49,7 @@ class Dashboard(QWidget):
     vertical_spacing = 20
     horizontal_spacing = 30
 
-    on_switch_to_single_channel_display_clicked = pyqtSignal(ChannelModel)
+    on_switch_to_single_channel_display_clicked = pyqtSignal(ChannelModel, GraphableDataKind)
     on_channel_list_update = pyqtSignal()
 
     def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker,
@@ -268,7 +269,7 @@ class Dashboard(QWidget):
                 chan.channel_model.on_channel_monitor_enabled.emit(False)
                 chan.channel_name_widget.set_inactive()
 
-    def switch_to_single_channel_display(self, channel_model):
+    def switch_to_single_channel_display(self, channel_model, default_graph):
         self.monitor.stop_monitoring()
-        self.on_switch_to_single_channel_display_clicked.emit(channel_model)
+        self.on_switch_to_single_channel_display_clicked.emit(channel_model, default_graph)
 

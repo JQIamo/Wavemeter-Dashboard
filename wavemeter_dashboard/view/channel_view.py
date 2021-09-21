@@ -13,6 +13,7 @@ from .widgets.channel_name_widget import ChannelNameWidget
 from .widgets.color_strip import ColorStrip
 from ..model.channel_alert import ChannelAlertAction
 from ..model.channel_model import ChannelModel
+from ..model.graphable_data_provider import GraphableDataKind
 
 if TYPE_CHECKING:
     from .dashboard import Dashboard
@@ -54,9 +55,12 @@ class ChannelView(QObject):
         self.channel_model.on_channel_alert_action_changed.connect(self.change_alert_status)
         self.channel_model.on_refresh_alert_display_requested.connect(self.alert_label.update)
 
-        self.pattern.on_mouse_clicked.connect(self.switch_to_single_channel_display)
-        self.freq_longterm.on_mouse_clicked.connect(self.switch_to_single_channel_display)
-        self.dac_longterm.on_mouse_clicked.connect(self.switch_to_single_channel_display)
+        self.pattern.on_mouse_clicked.connect(
+            lambda: self.switch_to_single_channel_display(GraphableDataKind.WIDE_PATTERN))
+        self.freq_longterm.on_mouse_clicked.connect(
+            lambda: self.switch_to_single_channel_display(GraphableDataKind.FREQ_LONGTERM))
+        self.dac_longterm.on_mouse_clicked.connect(
+            lambda: self.switch_to_single_channel_display(GraphableDataKind.DAC_LONGTERM))
 
         if channel_model.freq_setpoint:
             self.freq_longterm.add_vertical_line(
@@ -139,5 +143,5 @@ class ChannelView(QObject):
         elif alert_status == ChannelAlertAction.FLASH_ERROR:
             self.color_strip.flash_error()
     
-    def switch_to_single_channel_display(self):
-        self.dashboard.switch_to_single_channel_display(self.channel_model)
+    def switch_to_single_channel_display(self, default_graph):
+        self.dashboard.switch_to_single_channel_display(self.channel_model, default_graph)
