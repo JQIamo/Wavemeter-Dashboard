@@ -204,13 +204,13 @@ class Monitor(QObject):
             ch.on_pid_changed.emit()
 
     def get_auto_expo_params(self, channel_num):
-        assert not self.monitoring_lock.locked()
-        self.fiberswitch.switch_channel(channel_num)
-        time.sleep(0.2)
-        self.wavemeter.set_auto_exposure(True)
-        time.sleep(1)
-        exposure, exposure2 = self.wavemeter.get_exposure()
-        return exposure, exposure2
+        with self.monitoring_lock:
+            self.fiberswitch.switch_channel(channel_num)
+            time.sleep(0.2)
+            self.wavemeter.set_auto_exposure(True)
+            time.sleep(1)
+            exposure, exposure2 = self.wavemeter.get_exposure()
+            return exposure, exposure2
 
     def stop_monitoring(self):
         if not self.monitoring_lock.locked():
