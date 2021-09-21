@@ -115,6 +115,13 @@
              </item>
             </layout>
            </item>
+           <item>
+            <widget class="ToggleButton" name="monBtn">
+             <property name="text">
+              <string>MONITOR</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -182,6 +189,11 @@
    <class>FreqWavelengthLabel</class>
    <extends>QLabel</extends>
    <header>wavemeter_dashboard/view/widgets/freq_wavelength_label</header>
+  </customwidget>
+  <customwidget>
+   <class>ToggleButton</class>
+   <extends>QPushButton</extends>
+   <header>wavemeter_dashboard/view/widgets/misc</header>
   </customwidget>
  </customwidgets>
  <resources/>

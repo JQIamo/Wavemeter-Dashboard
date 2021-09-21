@@ -51,12 +51,12 @@ long-term frequency changes, etc.
 - [x] big screen: freq display
 - [x] monitor: single channel monitoring
 - [x] big screen: channel settings
+- [x] big screen: start/stop monitoring
+- [x] big screen: auto-exposure
 
 ### Planned
 - [ ] dashboard: delete channel
 - [ ] big screen: display the clicked graph by default
-- [ ] big screen: start/stop monitoring
-- [ ] big screen: auto-exposure
 - [ ] misc: wrap the whole program
 - [ ] main window: icon
 

@@ -65,6 +65,7 @@ class SingleChannelDisplay(QWidget):
         self.ui.resetBtn.clicked.connect(self.on_channel_setup_reset)
         self.ui.toDashboardBtn.clicked.connect(self.switch_back_to_dashboard)
         self.ui.selectGraphBtn.clicked.connect(self.on_select_graph_clicked)
+        self.ui.monBtn.clicked.connect(self.on_monitor_toggled)
 
         self.channel.on_freq_changed.connect(self.update_frequency)
         self.channel.on_refresh_alert_display_requested.connect(
@@ -134,3 +135,9 @@ class SingleChannelDisplay(QWidget):
         self.monitor.stop_monitoring()
         self._restore_original_channel_monitoring_status()
         self.on_switch_to_dashboard_clicked.emit()
+
+    def on_monitor_toggled(self, state):
+        if state:
+            self.monitor.start_monitoring()
+        else:
+            self.monitor.stop_monitoring()
