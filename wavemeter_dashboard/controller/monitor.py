@@ -197,10 +197,13 @@ class Monitor(QObject):
 
             try:
                 self.dac.set_dac_value(ch.dac_channel_num, output)
+                if ChannelAlertCode.PID_DAC_RAILED in ch.total_alerts:
+                    ch.on_alert_cleared.emit(ChannelAlertCode.PID_DAC_RAILED)
                 ch.dac_railed = False
             except DACOutOfBoundException:
                 ch.dac_railed = True
-                ch.on_new_alert.emit(ChannelAlertCode.PID_DAC_RAILED)
+                if ChannelAlertCode.PID_DAC_RAILED not in ch.total_alerts:
+                    ch.on_new_alert.emit(ChannelAlertCode.PID_DAC_RAILED)
 
             ch.dac_output = output
             ch.dac_longterm_data.append(output)
