@@ -226,6 +226,8 @@ class Monitor(QObject):
                     channel.on_alert_cleared.emit(ChannelAlertCode.QUEUED_FOR_MONITORING)
                     channel.on_alert_cleared.emit(ChannelAlertCode.PID_ENGAGED)
                     channel.on_alert_cleared.emit(ChannelAlertCode.PID_LOCKED)
+                    channel.on_alert_clear_dismissed.emit()
+
                     channel.on_new_alert.emit(ChannelAlertCode.IDLE)
 
             self.on_monitor_stopped.emit()

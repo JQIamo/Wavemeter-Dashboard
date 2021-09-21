@@ -23,6 +23,7 @@ class AlertTracker(QObject):
             channel.on_new_alert.connect(partial(self.add_alert, channel.channel_num))
             channel.on_alert_dismissed.connect(partial(self.dismiss_alert, channel.channel_num))
             channel.on_alert_cleared.connect(partial(self.clear_alert, channel.channel_num))
+            channel.on_alert_clear_dismissed.connect(lambda: self.clear_dismissed_alerts(channel.channel_num))
 
     def add_alert(self, channel_num, alert_code: ChannelAlertCode):
         lock = self.channel_locks[channel_num]
@@ -149,6 +150,13 @@ class AlertTracker(QObject):
 
         channel.on_refresh_alert_display_requested.emit()
         self.refresh_channel_action(channel)
+        lock.unlock()
+
+    def clear_dismissed_alerts(self, channel_num):
+        lock = self.channel_locks[channel_num]
+        lock.lock()
+        channel = self.channels[channel_num]
+        channel.dismissed_alerts = []
         lock.unlock()
 
     @staticmethod

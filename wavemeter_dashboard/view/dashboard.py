@@ -175,6 +175,7 @@ class Dashboard(QWidget):
                     widget.show()
 
             channel.on_new_alert.emit(ChannelAlertCode.IDLE)
+            view.alert_label.update()
             self.resize(self.width(), self.height())
 
     def on_add_channel_clicked(self):

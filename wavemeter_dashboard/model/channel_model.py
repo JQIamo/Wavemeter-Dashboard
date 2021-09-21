@@ -41,6 +41,7 @@ class ChannelModel(QObject):
     # signal from Monitor to AlertTracker
     on_new_alert = pyqtSignal(ChannelAlertCode)
     on_alert_cleared = pyqtSignal(ChannelAlertCode)
+    on_alert_clear_dismissed = pyqtSignal()
 
     # signal from ChannelView to AlertTracker
     on_alert_dismissed = pyqtSignal(ChannelAlertCode)
