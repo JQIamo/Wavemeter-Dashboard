@@ -2,7 +2,7 @@ from typing import Type, TYPE_CHECKING
 from PyQt5.QtCore import pyqtSignal
 
 from wavemeter_dashboard.view.widgets.dialog import Dialog, DialogStatus
-from wavemeter_dashboard.view.widgets.channel_setup import ChannelSetup, \
+from wavemeter_dashboard.view.widgets.channel_setup_widget import ChannelSetupWidget, \
     ChannelSetupInvalidInputException
 from wavemeter_dashboard.model.channel_model import ChannelModel
 from wavemeter_dashboard.controller.monitor import Monitor
@@ -16,13 +16,13 @@ class AddChannelDialog(Dialog):
 
     on_apply = pyqtSignal(ChannelModel)
 
-    def __init__(self, parent: 'Dashboard', monitor: Monitor, channel: ChannelModel=None):
+    def __init__(self, parent: 'Dashboard', monitor: Monitor, channel: ChannelModel = None):
         self.monitor = monitor
         self.channel_model = channel
         super().__init__(parent)
 
     def init_widget(self):
-        self.widget = ChannelSetup(self, self.monitor, self.channel_model)
+        self.widget = ChannelSetupWidget(self, self.monitor, self.channel_model)
         self.ui.applyBtn.clicked.connect(self.on_apply_clicked)
 
         return self.widget

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QLabel
-from PyQt5.QtCore import QRect, QTimer
+from PyQt5.QtCore import QRect, QTimer, QObject
 
 
 class ErrorBox(QLabel):
@@ -14,10 +14,11 @@ class WarningBox(QLabel):
     pass
 
 
-class ColorStrip:
+class ColorStrip(QObject):
     flash_timer = QTimer()
 
     def __init__(self, parent):
+        super().__init__(parent)
         self.info_box = InfoBox(parent)
         self.warning_box = WarningBox(parent)
         self.error_box = ErrorBox(parent)

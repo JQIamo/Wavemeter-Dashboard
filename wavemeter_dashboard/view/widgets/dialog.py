@@ -68,7 +68,6 @@ class Dialog(QWidget):
         parent.center_floating_widget = None
         self.on_close.emit(self.final_status)
         super().close()
-        self.setParent(None)
 
     def on_cancel_clicked(self):
         self.close()

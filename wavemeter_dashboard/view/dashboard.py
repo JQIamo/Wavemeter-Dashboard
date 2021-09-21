@@ -1,7 +1,8 @@
 from enum import Enum
 from typing import List, Dict
 
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QLabel, QApplication
+from PyQt5.QtCore import pyqtSignal
 from .ui.ui_dashboard import Ui_dashboard
 from .widgets.misc import *
 from .widgets.add_channel_dialog import AddChannelDialog
@@ -47,7 +48,10 @@ class Dashboard(QWidget):
     vertical_spacing = 20
     horizontal_spacing = 30
 
-    def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker):
+    on_switch_to_single_channel_display_clicked = pyqtSignal(ChannelModel)
+
+    def __init__(self, parent, monitor: Monitor, alert_tracker: AlertTracker,
+                 channels: List[ChannelModel]=None):
         super().__init__(parent)
 
         self.channels: List[ChannelView] = []
@@ -74,12 +78,14 @@ class Dashboard(QWidget):
         self.ui.addChannelBtn.clicked.connect(self.on_add_channel_clicked)
         self.ui.monBtn.clicked.connect(self.on_monitor_toggled)
         self.ui.saveSettingsBtn.clicked.connect(self.save_channel_settings)
+        self.ui.closeWindowButton.clicked.connect(QApplication.quit)
 
         self.center_floating_widget = None
 
         self.monitor.on_monitoring_channel.connect(self.on_monitoring_channel)
 
-        self.load_channels_from_config()
+        if channels:
+            self.load_channels_from_models(channels)
 
     def _init_table_header(self):
         for col, num in self.column_num_map.items():
@@ -106,15 +112,12 @@ class Dashboard(QWidget):
             self.ui.channelGridLayout.removeWidget(self.placeholder_prompt_label)
             self.placeholder_prompt_label = None
 
-    def load_channels_from_config(self):
-        channels = config.get("channels")
-        if channels:
-            for chan in channels:
-                model = ChannelModel.from_settings_dict(chan)
-                self.add_channel(model)
+    def load_channels_from_models(self, channels: List[ChannelModel]):
+        for model in channels:
+            self.add_channel(model)
 
-            if self.channels:
-                self.ui.monBtn.setEnabled(True)
+        if self.channels:
+            self.ui.monBtn.setEnabled(True)
 
     def find_channel_by_num(self, num):
         filtered = list(filter(
@@ -241,3 +244,8 @@ class Dashboard(QWidget):
             else:
                 chan.channel_model.on_channel_monitor_enabled.emit(False)
                 chan.channel_name_widget.set_inactive()
+
+    def switch_to_single_channel_display(self, channel_model):
+        self.monitor.stop_monitoring()
+        self.on_switch_to_single_channel_display_clicked.emit(channel_model)
+

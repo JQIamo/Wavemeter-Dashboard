@@ -23,11 +23,11 @@
 - [x] wavemeter: under-exposure over-exposure exception
 - [x] monitor: pid out-of-lock text warning
 - [x] monitor: pid railed text warning
-- [ ] dashboard: remove channel from monitoring
+- [x] dashboard: remove channel from monitoring
 - [ ] dashboard: delete channel
 - [ ] dashboard: add/delete columns dialog
 - [ ] dashboard: column width
-- [ ] dashboard: stacked widget
+- [x] dashboard: stacked widget
 - [x] dashboard: scroll
 - [ ] big screen: mulit-plot display
 - [ ] big screen: freq display

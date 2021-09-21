@@ -101,6 +101,14 @@ FreqWavelengthLabel {
     font-size: 30px;
 }
 
+FreqWavelengthLabel#bigFreqLabel {
+    font-size: 100px;
+}
+
+BigContentLabel {
+    font-size: 50px;
+}
+
 ErrorLabel {
     background: #ff0000;
     min-height: 50px;

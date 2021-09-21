@@ -12,11 +12,11 @@ class ChannelSetupInvalidInputException(Exception):
     pass
 
 
-class ChannelSetup(QWidget):
+class ChannelSetupWidget(QWidget):
     channel_range = (1, 16)
     _on_exposure_params_ready = pyqtSignal(int, int)
 
-    def __init__(self, parent, monitor: Monitor, channel: ChannelModel=None):
+    def __init__(self, parent, monitor: Monitor = None, channel: ChannelModel = None):
         super().__init__(parent)
         self.ui = Ui_channelSetup()
         self.ui.setupUi(self)
@@ -25,25 +25,33 @@ class ChannelSetup(QWidget):
         self.ui.autoExpoBtn.clicked.connect(self.on_auto_clicked)
         self._on_exposure_params_ready.connect(self.on_exposure_params_ready)
 
+        if self.channel_model:
+            self.fill()
+
         self.ui.removeChannelBtn.hide()
 
-        if self.channel_model:
-            ui = self.ui
-            model = self.channel_model
-            ui.chanNumEdit.setText(f"{model.channel_num:d}")
-            ui.chanNameEdit.setText(model.channel_name)
-            ui.expoEdit.setText(f"{model.expo_time:d}")
-            ui.expo2Edit.setText(f"{model.expo2_time:d}")
-            ui.pidBtn.setChecked(model.pid_enabled)
+    def setup(self, monitor, channel):
+        self.monitor = monitor
+        self.channel_model = channel
+        self.fill()
 
-            if model.freq_setpoint:
-                ui.setpointEdit.setText(convert_freq_for_forms(model.freq_setpoint))
-            if model.freq_max_error:
-                ui.errBoundEdit.setText(convert_freq_for_forms(model.freq_max_error))
+    def fill(self):
+        ui = self.ui
+        model = self.channel_model
+        ui.chanNumEdit.setText(f"{model.channel_num:d}")
+        ui.chanNameEdit.setText(model.channel_name)
+        ui.expoEdit.setText(f"{model.expo_time:d}")
+        ui.expo2Edit.setText(f"{model.expo2_time:d}")
+        ui.pidBtn.setChecked(model.pid_enabled)
 
-            self.set_text_if_not_empty(ui.dacChanEdit, model.dac_channel_num)
-            self.set_text_if_not_empty(ui.pParamEdit, model.pid_p_prop_val)
-            self.set_text_if_not_empty(ui.iParamEdit, model.pid_i_prop_val)
+        if model.freq_setpoint:
+            ui.setpointEdit.setText(convert_freq_for_forms(model.freq_setpoint))
+        if model.freq_max_error:
+            ui.errBoundEdit.setText(convert_freq_for_forms(model.freq_max_error))
+
+        self.set_text_if_not_empty(ui.dacChanEdit, model.dac_channel_num)
+        self.set_text_if_not_empty(ui.pParamEdit, model.pid_p_prop_val)
+        self.set_text_if_not_empty(ui.iParamEdit, model.pid_i_prop_val)
 
     def on_auto_clicked(self):
         ui = self.ui

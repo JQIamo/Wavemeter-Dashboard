@@ -1,2 +1,2 @@
 main.pyproject
-wavemeter_dashboard/view/ui/ui_single_channel_display.ui
+wavemeter_dashboard/view/ui/ui_data_select.ui

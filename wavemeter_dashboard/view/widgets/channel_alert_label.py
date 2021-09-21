@@ -8,7 +8,7 @@ from wavemeter_dashboard.model.channel_model import ChannelModel
 
 
 class ChannelAlertLabel(QLabel):
-    def __init__(self, parent, channel_model: ChannelModel):
+    def __init__(self, parent, channel_model: ChannelModel = None):
         super().__init__(parent)
 
         self._state = "normal"
@@ -77,6 +77,7 @@ class ChannelAlertLabel(QLabel):
             self.refresh_bg()
 
     def next_alert(self):
+        print(self.channel.total_alerts, self.channel.active_alerts)
         if len(self.channel.active_alerts) == 0:
             return
 

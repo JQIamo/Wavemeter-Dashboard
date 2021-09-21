@@ -29,7 +29,7 @@ class ChannelModel(QObject):
     on_pid_changed = pyqtSignal()
     on_reload = pyqtSignal()
 
-    # signal for ChannelVIew to notify Monitor
+    # signal for ChannelView to notify Monitor
     on_channel_monitor_enabled = pyqtSignal(bool)  # args: is_enabled
 
     # signal from AlertTracker to ChannelView
@@ -80,7 +80,6 @@ class ChannelModel(QObject):
         self.pid_i = 0
         self.pid_i_last_time = 0
         self.error = 0
-        self.dac_output = 0
         self.dac_longterm_data = LongtermData()
         self.dac_railed = False
         self.deviate_since = 0

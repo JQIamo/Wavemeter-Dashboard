@@ -14,13 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2">
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>BACK TO DASHBOARD</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="TitleLabel" name="titleLabel">
      <property name="text">
@@ -28,20 +21,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="0" column="3">
+    <widget class="QPushButton" name="toDashboardBtn">
+     <property name="text">
+      <string>BACK TO DASHBOARD</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="1" column="0" colspan="4">
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -64,7 +51,7 @@
             <widget class="GraphicsLayoutWidget" name="graphicsView"/>
            </item>
            <item>
-            <widget class="BigContentLabel" name="freqLabel">
+            <widget class="FreqWavelengthLabel" name="bigFreqLabel">
              <property name="text">
               <string>FREQ</string>
              </property>
@@ -75,7 +62,7 @@
          <item>
           <layout class="QVBoxLayout" name="setupLayout">
            <item>
-            <widget class="QLabel" name="channelNameLabel">
+            <widget class="ChannelNameLabel" name="channelNameLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                <horstretch>0</horstretch>
@@ -88,7 +75,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="alertLabel">
+            <widget class="ChannelAlertLabel" name="alertLabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                <horstretch>0</horstretch>
@@ -101,7 +88,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ChannelSetup" name="channelSetupWidget" native="true">
+            <widget class="ChannelSetupWidget" name="channelSetupWidget" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -120,7 +107,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="deleteChannelButton">
+              <widget class="QPushButton" name="applyBtn">
                <property name="text">
                 <string>APPLY</string>
                </property>
@@ -136,11 +123,37 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="1">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="selectGraphBtn">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>SELECT GRAPH</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>BigContentLabel</class>
+   <class>ChannelNameLabel</class>
    <extends>QLabel</extends>
    <header>wavemeter_dashboard/view/widgets/misc</header>
   </customwidget>
@@ -150,15 +163,25 @@
    <header>wavemeter_dashboard/view/widgets/misc</header>
   </customwidget>
   <customwidget>
-   <class>ChannelSetup</class>
+   <class>ChannelSetupWidget</class>
    <extends>QWidget</extends>
-   <header>wavemeter_dashboard/view/widgets/channel_setup</header>
+   <header>wavemeter_dashboard/view/widgets/channel_setup_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>GraphicsLayoutWidget</class>
    <extends>QGraphicsView</extends>
    <header>pyqtgraph</header>
+  </customwidget>
+  <customwidget>
+   <class>ChannelAlertLabel</class>
+   <extends>QLabel</extends>
+   <header>wavemeter_dashboard/view/widgets/channel_alert_label</header>
+  </customwidget>
+  <customwidget>
+   <class>FreqWavelengthLabel</class>
+   <extends>QLabel</extends>
+   <header>wavemeter_dashboard/view/widgets/freq_wavelength_label</header>
   </customwidget>
  </customwidgets>
  <resources/>

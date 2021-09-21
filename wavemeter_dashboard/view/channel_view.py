@@ -4,6 +4,7 @@ import random
 import numpy as np
 
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import QObject
 
 from .widgets.channel_alert_label import ChannelAlertLabel
 from .widgets.freq_wavelength_label import FreqWavelengthLabel
@@ -17,10 +18,11 @@ if TYPE_CHECKING:
     from .dashboard import Dashboard
 
 
-class ChannelView:
+class ChannelView(QObject):
     long_term_time_window = 300
 
     def __init__(self, dashboard: 'Dashboard', channel_model: ChannelModel, color_strip: ColorStrip):
+        super().__init__(dashboard)
         self.channel_model = channel_model
         self.dashboard = dashboard
         self.color_strip = color_strip
@@ -51,6 +53,10 @@ class ChannelView:
 
         self.channel_model.on_channel_alert_action_changed.connect(self.change_alert_status)
         self.channel_model.on_refresh_alert_display_requested.connect(self.alert_label.update)
+
+        self.pattern.on_mouse_clicked.connect(self.switch_to_single_channel_display)
+        self.freq_longterm.on_mouse_clicked.connect(self.switch_to_single_channel_display)
+        self.dac_longterm.on_mouse_clicked.connect(self.switch_to_single_channel_display)
 
         if channel_model.freq_setpoint:
             self.freq_longterm.add_vertical_line(
@@ -97,9 +103,12 @@ class ChannelView:
         max_amp = np.max(self.channel_model.pattern_data)
         if max_amp > self.dashboard.pattern_max_amp:
             self.dashboard.pattern_max_amp = max_amp
-
-        self.pattern.update_data(range(len(self.channel_model.pattern_data)),
-                                 self.channel_model.pattern_data)
+        if self.pattern.isVisible():
+            # don't do futile work
+            # copy this array really takes sometime!
+            # TODO: consider downsampling here
+            self.pattern.update_data(range(len(self.channel_model.pattern_data)),
+                                     self.channel_model.pattern_data)
 
     def on_pid_changed(self):
         now = time.time()
@@ -129,3 +138,6 @@ class ChannelView:
             self.color_strip.flash_warning()
         elif alert_status == ChannelAlertAction.FLASH_ERROR:
             self.color_strip.flash_error()
+    
+    def switch_to_single_channel_display(self):
+        self.dashboard.switch_to_single_channel_display(self.channel_model)

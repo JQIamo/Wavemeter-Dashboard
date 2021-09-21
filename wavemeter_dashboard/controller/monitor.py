@@ -54,8 +54,8 @@ class Monitor(QObject):
         if channel.pid_enabled:
             channel.on_new_alert.emit(ChannelAlertCode.PID_ENGAGED)
 
-        channel.on_alert_cleared(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL)
-        channel.on_alert_cleared(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
+        channel.on_alert_cleared.emit(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_TEMPORAL)
+        channel.on_alert_cleared.emit(ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
 
         channel.pid_i = 0
         channel.deviate_since = 0
@@ -108,7 +108,7 @@ class Monitor(QObject):
             self.wavemeter.set_exposure(ch.expo_time, ch.expo2_time)
             self.last_monitored_channel = ch
         else:
-            time.sleep(0.1)  # stop the PC from burning
+            time.sleep(0.05)  # stop the PC from burning
 
         success = False
         max_attempts = 6
@@ -127,6 +127,7 @@ class Monitor(QObject):
             # last chance before throwing out errors
             try:
                 ch.frequency = self.wavemeter.get_frequency() * 1e12
+                success = True
             except WavemeterWS7NoSignalException:
                 ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_NO_SIGNAL)
             except WavemeterWS7BadSignalException:
@@ -137,8 +138,9 @@ class Monitor(QObject):
                 ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_UNDER_EXPOSED)
             except WavemeterWS7Exception:
                 ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_UNKNOWN_ERROR)
-
-        ch.freq_longterm_data.append(ch.frequency)
+        
+        if not success:
+            return
 
         if ch.freq_setpoint:
             ch.error = ch.frequency - ch.freq_setpoint
@@ -175,6 +177,7 @@ class Monitor(QObject):
                         if ChannelAlertCode.PID_LOCKED not in ch.total_alerts:
                             ch.on_new_alert.emit(ChannelAlertCode.PID_LOCKED)
 
+        ch.freq_longterm_data.append(ch.frequency)
         ch.on_freq_changed.emit()
 
         if ch.pattern_enabled:
@@ -223,12 +226,16 @@ class Monitor(QObject):
             self.monitor_stop_cv.wait()
             self.on_monitor_stopped.emit()
 
+    def is_monitoring(self):
+        return self.monitoring_lock.locked()
+
     def add_channel(self, channel: ChannelModel):
         # should be called by the frontend
-        self.channels[channel.channel_num] = channel
-        channel.on_channel_monitor_enabled.connect(
-            partial(self.on_channel_monitor_enabled, channel.channel_num)
-        )
+        if channel.channel_num not in self.channels:
+            self.channels[channel.channel_num] = channel
+            channel.on_channel_monitor_enabled.connect(
+                partial(self.on_channel_monitor_enabled, channel.channel_num)
+            )
 
         return channel
 

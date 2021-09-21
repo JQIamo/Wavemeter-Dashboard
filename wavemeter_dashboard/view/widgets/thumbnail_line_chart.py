@@ -1,11 +1,13 @@
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
 from PyQt5.QtGui import QColor, QPen, QPainter
-from PyQt5.QtCore import QRectF, Qt, QPointF
+from PyQt5.QtCore import QRectF, Qt, QPointF, pyqtSignal
 
 from wavemeter_dashboard.model.longterm_data import LongtermData
 
 
 class ThumbnailLineChart(QChartView):
+    on_mouse_clicked = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -62,6 +64,7 @@ class ThumbnailLineChart(QChartView):
 
     def update_data(self, xs, ys):
         self.clear_series()
+        self.series.clear()
 
         self.x_min = min(xs)
         self.x_max = max(xs)
@@ -73,6 +76,7 @@ class ThumbnailLineChart(QChartView):
 
     def update_longterm_data(self, longterm: LongtermData):
         self.clear_series()
+        self.series.clear()
 
         longterm.transfer_to(self.series.append)
         self.x_min, self.x_max = longterm.get_time_range()
@@ -128,3 +132,5 @@ class ThumbnailLineChart(QChartView):
 
         painter.restore()
 
+    def mousePressEvent(self, event):
+        self.on_mouse_clicked.emit()

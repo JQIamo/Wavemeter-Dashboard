@@ -16,12 +16,14 @@ class AlertTracker(QObject):
         self.channels: Dict[ChannelModel] = {}
 
     def add_channel(self, channel: ChannelModel):
-        self.channels[channel.channel_num] = channel
-        channel.on_new_alert.connect(partial(self.add_alert, channel.channel_num))
-        channel.on_alert_dismissed.connect(partial(self.dismiss_alert, channel.channel_num))
-        channel.on_alert_cleared.connect(partial(self.clear_alert, channel.channel_num))
+        if channel.channel_num not in self.channels:
+            self.channels[channel.channel_num] = channel
+            channel.on_new_alert.connect(partial(self.add_alert, channel.channel_num))
+            channel.on_alert_dismissed.connect(partial(self.dismiss_alert, channel.channel_num))
+            channel.on_alert_cleared.connect(partial(self.clear_alert, channel.channel_num))
 
     def add_alert(self, channel_num, alert_code: ChannelAlertCode):
+        # print(f"adding {alert_code} to ch{channel_num}")
         need_update = False
         channel = self.channels[channel_num]
         alert = CHANNEL_ALERTS[alert_code]
@@ -85,18 +87,24 @@ class AlertTracker(QObject):
             self.refresh_channel_action(channel)
 
     def clear_alert(self, channel_num, code: ChannelAlertCode):
+        # print(f"cleaning {code} from ch{channel_num}")
         need_refresh = False
         channel = self.channels[channel_num]
         if code in channel.total_alerts:
+            # print(f"- clean from total_alerts")
             channel.total_alerts.remove(code)
+        # print(f"- total: {channel.total_alerts}")
 
         # if the alert is in the active list
         if code in channel.active_alerts:
             need_refresh = True
+            # print(f"- clean from active_alerts")
             channel.active_alerts.remove(code)
         elif code in channel.dismissed_alerts:
             # if not, then it might have been dismissed
             channel.dismissed_alerts.remove(code)
+        
+        # print(f"- active: {channel.active_alerts}")
 
         # restore alerts superseded by it
         if code in channel.superseded_alerts:
