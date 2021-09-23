@@ -1,3 +1,5 @@
+import time
+
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import QRect, QTimer, QObject
 
@@ -96,9 +98,11 @@ class ColorStrip(QObject):
         self.error_flashing = False
 
     def _on_flashing(self):
+        t = int(time.time())
+        flash_on = t % 2 == 0  # have assumed the interval of the clock is 1sec
         if self.error_flashing:
-            self.error_box.setVisible(not self.error_box.isVisible())
+            self.error_box.setVisible(flash_on)
         elif self.warning_flashing:
-            self.warning_box.setVisible(not self.warning_box.isVisible())
+            self.warning_box.setVisible(flash_on)
         elif self.info_flashing:
-            self.info_box.setVisible(not self.info_box.isVisible())
+            self.info_box.setVisible(flash_on)
