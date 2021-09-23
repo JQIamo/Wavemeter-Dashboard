@@ -25,6 +25,7 @@ class AddChannelDialog(Dialog):
     def init_widget(self):
         self.widget = ChannelSetupWidget(self, self.monitor, self.channel_model)
         self.ui.applyBtn.clicked.connect(self.on_apply_clicked)
+        self.widget.setup()
 
         return self.widget
 
@@ -41,4 +42,4 @@ class AddChannelDialog(Dialog):
             self.final_status = DialogStatus.OK
             self.close()
         except ChannelSetupInvalidInputException as e:
-            self.display_error(e)
+            self.display_error(str(e))

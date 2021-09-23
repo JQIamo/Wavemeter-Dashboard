@@ -80,10 +80,13 @@ class Monitor(QObject):
                         break
 
                     # t = time.time()
-                    self.on_monitoring_channel.emit(channel.channel_num)
-                    channel.on_new_alert.emit(ChannelAlertCode.MONTIROING)
-                    self._update_one_channel(channel.channel_num)
-                    channel.on_alert_cleared.emit(ChannelAlertCode.MONTIROING)
+                    if not self.last_monitored_channel or self.last_monitored_channel != channel:
+                        self.on_monitoring_channel.emit(channel.channel_num)
+                        channel.on_new_alert.emit(ChannelAlertCode.MONTIROING)
+                        self._update_one_channel(channel.channel_num)
+                        channel.on_alert_cleared.emit(ChannelAlertCode.MONTIROING)
+                    else:
+                        self._update_one_channel(channel.channel_num)
                     # print(f"fps {1/(time.time() - t)}")
 
         self.stop_monitoring_flag = False
@@ -104,6 +107,7 @@ class Monitor(QObject):
         else:
             time.sleep(0.05)  # stop the PC from burning
 
+        not_successful_last_time = (ch.frequency is None)
         success = False
         max_attempts = 6
         for attempt in range(max_attempts - 1):
@@ -133,10 +137,21 @@ class Monitor(QObject):
                 ch.on_new_alert.emit(ChannelAlertCode.WAVEMETER_UNKNOWN_ERROR)
         
         if not success:
+            ch.frequency = None
             return
+        
+        if not_successful_last_time:
+            ch.on_alert_cleared.emit(ChannelAlertCode.WAVEMETER_NO_SIGNAL)
+            ch.on_alert_cleared.emit(ChannelAlertCode.WAVEMETER_BAD_SIGNAL)
+            ch.on_alert_cleared.emit(ChannelAlertCode.WAVEMETER_OVER_EXPOSED)
+            ch.on_alert_cleared.emit(ChannelAlertCode.WAVEMETER_UNDER_EXPOSED)
+            ch.on_alert_cleared.emit(ChannelAlertCode.WAVEMETER_UNKNOWN_ERROR)
+        
+        ch.freq_longterm_data.append(ch.frequency)
 
         if ch.freq_setpoint:
             ch.error = ch.frequency - ch.freq_setpoint
+            ch.err_longterm_data.append(ch.error)
             if ch.freq_max_error:
                 if abs(ch.error) > ch.freq_max_error:
                     ch.stable_since = 0
@@ -170,7 +185,6 @@ class Monitor(QObject):
                         if ChannelAlertCode.PID_LOCKED not in ch.total_alerts:
                             ch.on_new_alert.emit(ChannelAlertCode.PID_LOCKED)
 
-        ch.freq_longterm_data.append(ch.frequency)
         ch.on_freq_changed.emit()
 
         if ch.isSignalConnected(ch.on_pattern_changed_meta):

@@ -180,6 +180,8 @@ class Dashboard(QWidget):
             view.alert_label.update()
             self.resize(self.width(), self.height())
 
+            self.on_channel_list_update.emit()
+
     def remove_channel(self, channel_num):
         if self.monitor.is_monitoring():
             self.monitor.stop_monitoring()

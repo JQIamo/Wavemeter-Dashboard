@@ -158,20 +158,19 @@ class ErrLongtermDataProvider(GraphableDataProvider):
 
     def get_data(self):
         if self.channel.freq_setpoint:
-            return self.channel.freq_longterm_data.get_data()
+            return self.channel.err_longterm_data.get_data()
         return None
 
     def transfer_data(self, append_method):
         # not efficient, not recommended
         if self.channel.freq_setpoint:
-            setpoint = self.channel.freq_setpoint
-            self.channel.freq_longterm_data.transfer_to(
-                append_method, lambda pair: (pair[0], pair[1] - setpoint))
+            self.channel.err_longterm_data.transfer_to(
+                append_method)
 
     def append_newest_data(self, append_method):
         if self.channel.freq_setpoint:
-            x, y = self.channel.freq_longterm_data.get_newest_point()
-            append_method(x, y - self.channel.freq_setpoint)
+            x, y = self.channel.err_longterm_data.get_newest_point()
+            append_method(x, y)
 
 
 class DACLongtermDataProvider(GraphableDataProvider):

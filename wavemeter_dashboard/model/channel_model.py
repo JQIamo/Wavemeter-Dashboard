@@ -76,6 +76,7 @@ class ChannelModel(QObject):
         self.pattern_data = np.array([])
         self.wide_pattern_data = np.array([])
         self.freq_longterm_data = LongtermData()
+        self.err_longterm_data = LongtermData()
 
         self.freq_max_error = None
         self.pid_i = 0

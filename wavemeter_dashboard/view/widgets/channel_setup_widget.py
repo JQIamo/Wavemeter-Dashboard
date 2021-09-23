@@ -26,20 +26,32 @@ class ChannelSetupWidget(QWidget):
         self.ui.dacResetBtn.clicked.connect(self.on_reset_dac_clicked)
         self._on_exposure_params_ready.connect(self.on_exposure_params_ready)
 
-        if self.monitor.is_monitoring():
-            self.ui.autoExpoBtn.setEnabled(False)
-        self.monitor.on_monitor_started.connect(lambda: self.ui.autoExpoBtn.setEnabled(False))
-        self.monitor.on_monitor_stopped.connect(lambda: self.ui.autoExpoBtn.setEnabled(True))
 
         if self.channel_model:
             self.fill()
 
         self.ui.removeChannelBtn.hide()
 
-    def setup(self, monitor, channel):
-        self.monitor = monitor
-        self.channel_model = channel
+    def setup(self, monitor=None, channel=None):
+        if monitor:
+            self.monitor = monitor
+        if channel:
+            self.channel_model = channel
+        if not self.monitor:
+            self.ui.autoExpoBtn.setEnabled(False)
+        else:
+            if self.monitor.is_monitoring():
+                self.ui.autoExpoBtn.setEnabled(False)
+            self.monitor.on_monitor_started.connect(self.on_monitor_started)
+            self.monitor.on_monitor_stopped.connect(self.on_monitor_stopped)
+
         self.fill()
+
+    def on_monitor_started(self):
+        self.ui.autoExpoBtn.setEnabled(False)
+
+    def on_monitor_stopped(self):
+        self.ui.autoExpoBtn.setEnabled(True)
 
     def fill(self):
         ui = self.ui

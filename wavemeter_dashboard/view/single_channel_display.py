@@ -76,6 +76,7 @@ class SingleChannelDisplay(QWidget):
         assert not monitor.is_monitoring()
         self._suppress_other_channel_update()
         monitor.start_monitoring()
+        self.ui.monBtn.setChecked(True)
 
     def _suppress_other_channel_update(self):
         for channel in self.monitor.channels.values():
