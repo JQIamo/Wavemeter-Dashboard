@@ -3,7 +3,7 @@ from typing import List, Dict
 
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
 from PyQt5.QtCore import pyqtSignal, QObject
-from pyqtgraph import PlotItem
+from pyqtgraph import PlotItem, mkPen
 
 from .ui.ui_single_channel_display import Ui_singleChannelView
 from wavemeter_dashboard.controller.alert_tracker import AlertTracker
@@ -25,7 +25,8 @@ class Graph(QObject):
                                        data_provider.y_axis_unit),
                                  bottom=(data_provider.x_axis_label,
                                          data_provider.x_axis_unit))
-        self.plot = self.plot_item.plot()
+        self.pen = mkPen(color="w", width=2)
+        self.plot = self.plot_item.plot(pen=self.pen)
 
         if data_provider.y_axis_scale != 1:
             self.plot.setScale(data_provider.y_axis_scale)
