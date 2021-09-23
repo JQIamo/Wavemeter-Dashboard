@@ -62,11 +62,32 @@
             "pid_enabled": false,
             "pid_i_prop_val": 0,
             "pid_p_prop_val": -1
+        },
+        {
+            "alert_dac_railed_enabled": false,
+            "alert_error_out_of_bound_enabled": false,
+            "alert_wmt_enabled": false,
+            "channel_color": [
+                0,
+                204,
+                204
+            ],
+            "channel_name": "689BN",
+            "channel_num": 12,
+            "dac_channel_num": null,
+            "expo2_time": 6,
+            "expo_time": 10,
+            "freq_max_error": null,
+            "freq_setpoint": null,
+            "monitor_enabled": false,
+            "pid_enabled": false,
+            "pid_i_prop_val": null,
+            "pid_p_prop_val": null
         }
     ],
     "dac_com_port": "COM8",
     "fiberswitch_com_port": "COM5",
-    "full_screen": false,
+    "full_screen": true,
     "longterm_length_limit": 200,
     "wait_time_after_switch": 0.2,
     "wait_time_before_deviating_warning": 5,

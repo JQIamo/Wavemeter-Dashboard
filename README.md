@@ -8,7 +8,7 @@ Some cool features:
 of several channels.
 - PID (well, actually no D, just PI) control to set the DAC to fight against
 frequency error.
-- Signal Channel Display to let you have a clear view of the wave meter pattern,
+- Signal channel display to let you have a clear view of the wave meter pattern,
 long-term frequency changes, etc.
 - Alert system, screaming at you if things went wrong.
 
@@ -16,49 +16,26 @@ long-term frequency changes, etc.
 
 ![Dashboard View](wavemeter_dashboard/docs/dashboard_view_screenshot.png)
 
+![Single Channel View](wavemeter_dashboard/docs/single_channel_view_screenshot.png)
+
+## Usage
+
+1. Dependencies `pyqt5`, `numpy`, `scipy`, `pyqtgraph` should be installed in
+advance.
+2. Modified `config.json` to set the correct COM port of each device.
+3. Run `main.py` with python.
+
+## Docs
+
+A introduction that briefly goes through the structure of this program can be 
+found [here](wavemeter_dashboard/docs/README.md).
+
 
 ## TODO
 
-### Done
-
-- [x] dac: control instruction
-- [x] dac: out-of-bound exception
-- [x] channel setup: unit display
-- [x] monitor: dac output
-- [x] wavemeter: read/set exposure params
-- [x] channel setup widget: fill in auto exposure params
-- [x] monitor: set auto exposure params when switching
-- [x] dashboard: channel strip background
-- [x] dashboard: flash warning
-- [x] dashboard: edit channel
-- [x] dashboard: channel quick control
-- [x] [BUG] dashboard: mysterious floating graph on top left corner
-- [x] [BUG] dashboard: monitor button and add channel button still grey after dialog closed
-- [x] [BUG] channel setup: crash if not dac channel set
-- [x] [BUG] dashboard: color strip misplaced
-- [x] monitor: determine wait time after setting exposure dynamically
-- [x] dashboard: make the color strip less annoying when monitoring
-- [x] channel view: emit warning
-- [x] channel view: keep track of errors
-- [x] channel view: display freq warning range
-- [x] wavemeter: under-exposure over-exposure exception
-- [x] monitor: pid out-of-lock text warning
-- [x] monitor: pid railed text warning
-- [x] dashboard: remove channel from monitoring
-- [x] dashboard: stacked widget
-- [x] dashboard: scroll
-- [x] big screen: mulit-plot display
-- [x] big screen: freq display
-- [x] monitor: single channel monitoring
-- [x] big screen: channel settings
-- [x] big screen: start/stop monitoring
-- [x] big screen: auto-exposure
-- [x] dashboard: delete channel
-- [x] big screen: display the clicked graph by default
-
 ### Planned
-- [ ] misc: wrap the whole program
 - [ ] main window: icon
+- [ ] misc: wrap the whole program with `setup.py`.
 
 ### Good to have
 - [ ] thumbnail: scroll zoom in/out
