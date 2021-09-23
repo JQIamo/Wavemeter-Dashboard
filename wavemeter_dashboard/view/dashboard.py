@@ -201,6 +201,8 @@ class Dashboard(QWidget):
         self.monitor.remove_channel(channel_num)
         self.alert_tracker.remove_channel(channel_num)
 
+        self.on_channel_list_update.emit()
+
     def on_add_channel_clicked(self):
         dialog = AddChannelDialog(self, self.monitor)
         self.ui.addChannelBtn.setEnabled(False)

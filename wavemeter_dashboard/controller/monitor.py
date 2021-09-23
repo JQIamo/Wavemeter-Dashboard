@@ -160,7 +160,7 @@ class Monitor(QObject):
 
                     time_elapsed = time.time() - ch.deviate_since
                     if time_elapsed > self.out_of_lock_error_wait_time:
-                        if ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING \
+                        if ch.pid_enabled and ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING \
                                 not in ch.total_alerts:
                             ch.on_new_alert.emit(
                                 ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
