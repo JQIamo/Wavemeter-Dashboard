@@ -181,7 +181,7 @@ class Monitor(QObject):
                             ch.on_alert_cleared.emit(
                                 ChannelAlertCode.PID_ERROR_OUT_OF_BOUND_LASTING)
 
-                    if time.time() - ch.stable_since > self.locked_wait_time:
+                    if ch.pid_enabled and time.time() - ch.stable_since > self.locked_wait_time:
                         if ChannelAlertCode.PID_LOCKED not in ch.total_alerts:
                             ch.on_new_alert.emit(ChannelAlertCode.PID_LOCKED)
 
