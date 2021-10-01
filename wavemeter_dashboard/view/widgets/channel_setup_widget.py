@@ -26,9 +26,6 @@ class ChannelSetupWidget(QWidget):
         self.ui.dacResetBtn.clicked.connect(self.on_reset_dac_clicked)
         self._on_exposure_params_ready.connect(self.on_exposure_params_ready)
 
-        if self.channel_model:
-            self.fill()
-
         self.ui.removeChannelBtn.hide()
 
     def setup(self, monitor=None, channel=None):
@@ -44,7 +41,8 @@ class ChannelSetupWidget(QWidget):
             self.monitor.on_monitor_started.connect(self.on_monitor_started)
             self.monitor.on_monitor_stopped.connect(self.on_monitor_stopped)
 
-        self.fill()
+        if self.channel_model:
+            self.fill()
 
     def on_monitor_started(self):
         self.ui.autoExpoBtn.setEnabled(False)
@@ -55,6 +53,7 @@ class ChannelSetupWidget(QWidget):
     def fill(self):
         ui = self.ui
         model = self.channel_model
+
         ui.chanNumEdit.setText(f"{model.channel_num:d}")
         ui.chanNameEdit.setText(model.channel_name)
         ui.expoEdit.setText(f"{model.expo_time:d}")
