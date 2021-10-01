@@ -44,6 +44,7 @@ class WavemeterWS7:
                                         version_rev, version_build)
 
         self._pattern_wait_event_registered = False
+        api.dll.Operation(const.cCtrlStartMeasurement)
 
     def get_frequency(self):
         frequency = api.dll.GetFrequency(0.0)
@@ -109,7 +110,8 @@ class WavemeterWS7:
             # the last arg is timeout, -1 means keep waiting
             api.dll.Instantiate(const.cInstNotification,
                                 const.cNotifyInstallWaitEvent,
-                                c_long(-1), c_long(0))
+                                c_long(500), c_long(0))
+            self._pattern_wait_event_registered = True                    
 
         mode = c_long(0)
         intval = c_long(1)
@@ -141,7 +143,8 @@ class WavemeterWS7:
             # -1 means keep waiting no timeout (for WaitForWLMEvent)
             api.dll.Instantiate(const.cInstNotification,
                                 const.cNotifyInstallWaitEvent,
-                                c_long(-1), c_long(0))
+                                c_long(500), c_long(0))
+            self._pattern_wait_event_registered = True
 
         pattern_flag = const.cSignal1Interferometers if not wide else \
             const.cSignal1WideInterferometer
